@@ -1,4 +1,6 @@
+import 'package:device_info_plus/device_info_plus.dart';
 import 'package:flutter/material.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 final Color purple = hexToColor("#7630fa");
 final Color yellow = hexToColor("#f5d547");
@@ -63,3 +65,28 @@ class StyledText extends StatelessWidget {
             fontFamily: fontFamily));
   }
 }
+
+Future<bool> storagePermission() async {
+    final DeviceInfoPlugin info = DeviceInfoPlugin();
+    final AndroidDeviceInfo androidInfo = await info.androidInfo;
+    final int androidVersion = int.parse(androidInfo.version.release);
+    bool havePermission = false;
+
+    if (androidVersion >= 13) {
+      final request = await [
+        Permission.videos,
+        Permission.photos,
+        Permission.manageExternalStorage,
+      ].request();
+      havePermission =
+          request.values.every((status) => status == PermissionStatus.granted);
+    } else {
+      final status = await Permission.storage.request();
+      havePermission = status.isGranted;
+    }
+
+    if (!havePermission) {
+      await openAppSettings();
+    }
+    return havePermission;
+  }

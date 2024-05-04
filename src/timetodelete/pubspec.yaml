@@ -38,13 +38,19 @@ dependencies:
   google_nav_bar: ^5.0.6
   google_fonts: ^6.1.0
   permission_handler: ^11.0.1
-  # flutter_launcher_icons: ^0.13.1
-  receive_intent: ^0.2.4
+  pick_or_save: ^2.2.4
+  flutter_sharing_intent: ^1.1.0
   path_provider: ^2.1.1
+  filesystem_picker: ^4.0.0
   media_scanner: ^2.1.0
-  open_filex: ^4.3.4
-  hive: ^2.2.3
-  hive_flutter: ^1.1.0
+  device_info_plus: ^10.1.0
+  animated_search_bar: ^2.7.1
+  # file_picker: ^8.0.3
+  # open_filex: ^4.3.4
+  # hive: ^2.2.3
+  # hive_flutter: ^1.1.0
+  flutter_riverpod: ^2.4.9
+  riverpod_annotation: ^2.3.3
 
 dev_dependencies:
   flutter_test:
@@ -56,6 +62,10 @@ dev_dependencies:
   # package. See that file for information about deactivating specific lint
   # rules and activating additional ones.
   flutter_lints: ^2.0.0
+  riverpod_generator: ^2.3.9
+  build_runner: ^2.4.8
+  custom_lint: ^0.5.8
+  riverpod_lint: ^2.3.7
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
