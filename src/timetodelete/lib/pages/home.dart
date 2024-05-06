@@ -72,7 +72,7 @@ class _HomeState extends State<Home> {
               ElevatedButton(
                 onPressed: () async {
                   Iterable<String>? selectedFiles = await FilesystemPicker.open(
-                    title: 'Select file',
+                    title: 'Select files',
                     context: context,
                     multiSelect: true,
                     rootDirectories: [Directory('/storage/emulated/0/')],

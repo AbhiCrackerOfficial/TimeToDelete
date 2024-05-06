@@ -1,29 +1,37 @@
+// Imported libraries
 import 'dart:async';
 import 'dart:io';
 
+// External packages
 import 'package:filesystem_picker/src/utils/models/file_system_mini_item.dart';
 import 'package:flutter/material.dart';
 import 'package:path/path.dart' as path;
 
+// Internal files
 import '../constants/enums/file_system_type.dart';
 import '../constants/typedefs/typedefs.dart';
 import 'filesystem_list_tile.dart';
 
+// FilesystemList class for displaying directory contents
 class FilesystemList extends StatelessWidget {
-  final List<FileSystemMiniItem> items;
-  final bool isRoot;
-  final bool isSearching;
-  final Directory rootDirectory;
-  final FilesystemType fsType;
-  final Color? folderIconColor;
-  final List<String>? allowedExtensions;
-  final ValueChanged<Directory> onChange;
-  final ValueSelected onSelect;
-  final Iterable<String> selectedItems;
-  final bool multiSelect;
-  final ThemeData? themeData;
-  final TextDirection? textDirection;
+  // Properties
+  final List<FileSystemMiniItem> items; // List of filesystem items
+  final bool isRoot; // Indicator if the current directory is the root
+  final bool isSearching; // Indicator if the user is searching for items
+  final Directory rootDirectory; // Root directory
+  final FilesystemType fsType; // Type of filesystem items to display
+  final Color? folderIconColor; // Color for folder icons
+  final List<String>? allowedExtensions; // List of allowed file extensions
+  final ValueChanged<Directory> onChange; // Callback for directory change
+  final ValueSelected onSelect; // Callback for item selection
+  final Iterable<String> selectedItems; // Selected items
+  final bool multiSelect; // Indicator if multiple items can be selected
+  final ThemeData? themeData; // Theme data
+  final TextDirection? textDirection; // Text direction
+  final bool isTimeSorting; // Indicator if sorting by time
+  final bool isAlphaSorting; // Indicator if sorting alphabetically
 
+  // Constructor
   FilesystemList({
     Key? key,
     required this.items,
@@ -39,14 +47,28 @@ class FilesystemList extends StatelessWidget {
     this.themeData,
     this.textDirection,
     this.isSearching = false,
+    this.isTimeSorting = false,
+    this.isAlphaSorting = false,
   }) : super(key: key);
 
+  String handleSort() {
+    if (isTimeSorting) {
+      return 'Time';
+    } else if (isAlphaSorting) {
+      return 'Alpha';
+    } else {
+      return 'None';
+    }
+  }
+
+  // Method to retrieve directory contents asynchronously
   Future<List<FileSystemEntity>> _getDirContents() {
+    var items = <FileSystemEntity>[]; // List to hold filesystem entities
+    var completer =
+        Completer<List<FileSystemEntity>>(); // Completer for async operation
+
+    // If searching, return items without listing directories
     if (isSearching) {
-      // return the items without any directory to show
-      var items = <FileSystemEntity>[];
-      var completer = Completer<List<FileSystemEntity>>();
-      // list all the items present in this.items
       items.addAll(this.items.map((e) {
         if (e.type == FileSystemEntityType.file) {
           return File(e.absolutePath);
@@ -57,12 +79,18 @@ class FilesystemList extends StatelessWidget {
         }
       }));
 
-      completer.complete(items);
-      return completer.future;
-    } else {
-      var items = <FileSystemEntity>[];
+      if (handleSort() == 'Time') {
+        items.sort(
+            (a, b) => b.statSync().modified.compareTo(a.statSync().modified));
+      } else if (handleSort() == 'Alpha') {
+        items.sort((a, b) => a.path.compareTo(b.path));
+      } else {
+        items.sort((a, b) => a.path.compareTo(b.path));
+      }
 
-      var completer = Completer<List<FileSystemEntity>>();
+      completer.complete(items);
+    } else {
+      // If not searching, list contents of root directory
       var lister = rootDirectory.list(recursive: false);
       lister.listen(
         (file) {
@@ -70,66 +98,83 @@ class FilesystemList extends StatelessWidget {
             if ((file is File) &&
                 (allowedExtensions != null) &&
                 (allowedExtensions!.isNotEmpty)) {
-              if (!allowedExtensions!.contains(path.extension(file.path)))
+              if (!allowedExtensions!.contains(path.extension(file.path))) {
                 return;
+              }
             }
             items.add(file);
           }
         },
         onDone: () {
-          items.sort((a, b) => a.path.compareTo(b.path));
+          if (handleSort() == 'Time') {
+            items.sort((a, b) =>
+                b.statSync().modified.compareTo(a.statSync().modified));
+            print('Sorting by time');
+          } else if (handleSort() == 'Alpha') {
+            items.sort((a, b) => a.path.compareTo(b.path));
+            print('Sorting alphabetically');
+          } else {
+            print('No sorting');
+            items.sort((a, b) => a.path.compareTo(b.path));
+          }
           completer.complete(items);
         },
+        onError: (error) {
+          completer.completeError(error); // Handle error
+        },
       );
-      return completer.future;
     }
+
+    return completer.future; // Return future of directory contents
   }
 
+  // Widget for top navigation to parent directory
   InkWell _topNavigation() {
     return InkWell(
       onTap: () {
         final li = rootDirectory.path.split(Platform.pathSeparator)
           ..removeLast();
-        onChange(Directory(li.join(Platform.pathSeparator)));
+        onChange(Directory(
+            li.join(Platform.pathSeparator))); // Navigate to parent directory
       },
       child: const ListTile(
-        leading: Icon(Icons.arrow_upward, size: 32),
-        title: Text('...', textScaleFactor: 1.5),
+        leading: Icon(Icons.arrow_upward, size: 32), // Icon for navigating up
+        title:
+            Text('...', textScaleFactor: 1.5), // Text indicating navigation up
       ),
     );
   }
 
+  // Build method to create widget
   @override
   Widget build(BuildContext context) {
     return FutureBuilder(
       future: _getDirContents(),
       builder: (BuildContext context,
           AsyncSnapshot<List<FileSystemEntity>> snapshot) {
-        items.clear();
+        items.clear(); // Clear existing items
         if (snapshot.hasData) {
-          var chs = <Widget>[];
+          var chs = <Widget>[]; // List of children widgets
 
+          // Add top navigation widget if not root directory
           if (!isRoot) {
-            chs.add(_topNavigation()); // up/back one level
-            chs.add(Divider(color: Colors.grey, height: 1));
+            chs.add(_topNavigation()); // Add navigation widget
+            chs.add(Divider(color: Colors.grey, height: 1)); // Divider line
           }
 
+          // Process directory contents
           if (snapshot.data!.isNotEmpty) {
-            //List<FileSystemEntity> symbolicLinks = [];
-            var dirs = <FileSystemEntity>[];
-            var files = <FileSystemEntity>[];
+            var dirs = <FileSystemEntity>[]; // List of directories
+            var files = <FileSystemEntity>[]; // List of files
             snapshot.data!.forEach((fse) {
               if (fse is File) {
                 files.add(fse);
               } else if (fse is Directory) {
                 dirs.add(fse);
               }
-              // else if (fse is Link) {
-              //   symbolicLinks.add(fse);
-              // }
             });
 
-            //symbolicLinks.followedBy(dirs).
+            // Concatenate directories and files
             dirs.followedBy(files).forEach((fse) {
               chs.add(
                 FilesystemListTile(
@@ -146,7 +191,8 @@ class FilesystemList extends StatelessWidget {
                   textDirection: textDirection,
                 ),
               );
-              chs.add(Divider(color: Colors.grey, height: 1));
+              chs.add(Divider(
+                  color: Colors.grey, height: 1)); // Divider between items
               items.add(
                 FileSystemMiniItem(
                     fse.absolute.path,
@@ -159,14 +205,14 @@ class FilesystemList extends StatelessWidget {
             });
           }
           return ListView(
-            physics: const BouncingScrollPhysics(),
+            physics: const BouncingScrollPhysics(), // Bouncing scroll physics
             shrinkWrap: true,
             semanticChildCount: chs.length,
-            children: chs,
+            children: chs, // Rendered children
           );
         }
         return const Center(
-          child: CircularProgressIndicator(),
+          child: CircularProgressIndicator(), // Loading indicator
         );
       },
     );

@@ -14,7 +14,6 @@ import 'package:filesystem_picker/src/widgets/file_system_list.dart';
 import 'package:filesystem_picker/src/widgets/filename_text.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
-import 'package:flutter/widgets.dart';
 import 'package:path/path.dart' as pt;
 
 /// FileSystem file or folder picker dialog.
@@ -119,6 +118,8 @@ class _FilesystemPickerState extends State<FilesystemPicker> {
   bool loadingFSE = true;
   bool toggleSelectAll = false;
   bool isSearching = false;
+  bool isTimeSorting = false;
+  bool isAlphaSorting = false;
   SearchController searchController = SearchController();
 
   final List<FileSystemMiniItem> items = [];
@@ -137,7 +138,7 @@ class _FilesystemPickerState extends State<FilesystemPicker> {
   void initState() {
     super.initState();
 
-    SchedulerBinding.instance!.addPostFrameCallback((timeStamp) {
+    SchedulerBinding.instance.addPostFrameCallback((timeStamp) {
       _requestPermission();
       if (widget.rootDirectories.isEmpty) {
         throw Exception("rootDirectories can't be empty.");
@@ -208,13 +209,13 @@ class _FilesystemPickerState extends State<FilesystemPicker> {
     });
   }
 
-  // change directory and put the previous directory into history stack
+  // Change directory and put the previous directory into history stack.
   void _changeDirectory(Directory value) {
     if (directory!.absolute.path != value.absolute.path) {
       toggleSelectAll = false;
       history.push(directory!);
       _setDirectory(value);
-      if (widget.multiSelect == false) {
+      if (!widget.multiSelect) {
         selectedPaths.clear();
       }
     }
@@ -296,6 +297,22 @@ class _FilesystemPickerState extends State<FilesystemPicker> {
                                   });
                                 },
                                 icon: Icon(Icons.search)),
+                            IconButton(
+                                onPressed: () {
+                                  setState(() {
+                                    isTimeSorting = !isTimeSorting;
+                                    // print(isTimeSorting);
+                                  });
+                                },
+                                icon: Icon(Icons.access_time)),
+                            IconButton(
+                                onPressed: () {
+                                  setState(() {
+                                    isAlphaSorting = !isAlphaSorting;
+                                    // print(isAlphaSorting);
+                                  });
+                                },
+                                icon: Icon(Icons.sort_by_alpha)),
                           ],
                     bottom: _buildBreadCrumb(context),
                   ),
@@ -312,13 +329,22 @@ class _FilesystemPickerState extends State<FilesystemPicker> {
                           padding: const EdgeInsets.all(8.0),
                           child: TextField(
                             decoration: InputDecoration(
-                              hintText: 'Search',
+                              hintText: 'Search Files',
                               prefixIcon: Icon(Icons.search),
+                              suffixIcon: IconButton(
+                                onPressed: () {
+                                  setState(() {
+                                    searchController.clear;
+                                    items.clear();
+                                  });
+                                },
+                                icon: Icon(Icons.clear),
+                              ),
                             ),
                             controller: searchController,
                             onTap: () {
-                              items.clear();
-                              searchController.clear();
+                              // items.clear();
+                              // searchController.clear();
                             },
                             onChanged: (value) {
                               items.clear();
@@ -355,13 +381,7 @@ class _FilesystemPickerState extends State<FilesystemPicker> {
       child: Theme(
         data: ThemeData(
           textTheme: TextTheme(
-            button: TextStyle(
-                // color: AppBarTheme.of(context).textTheme?.headline6?.color ??
-                //     (widget.themeData ?? Theme.of(context))
-                //         .primaryTextTheme
-                //         .headline6
-                //         ?.color,
-                ),
+            labelLarge: TextStyle(),
           ),
         ),
         child: Breadcrumbs<String>(
@@ -382,142 +402,101 @@ class _FilesystemPickerState extends State<FilesystemPicker> {
   }
 
   Widget _buildDrawer(BuildContext context) {
+    bool showSelectDirectory = widget.rootDirectories.length > 1;
+    bool showSelectedItems = widget.multiSelect;
+
     return Drawer(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         mainAxisSize: MainAxisSize.max,
         children: [
-          Visibility(
-            visible: widget.rootDirectories.length > 1,
-            child: Material(
-              color: (widget.themeData ?? Theme.of(context)).primaryColor,
+          if (showSelectDirectory)
+            Material(
+              color: widget.themeData?.primaryColor ??
+                  Theme.of(context).primaryColor,
               child: SafeArea(
                 child: Container(
                   margin: EdgeInsets.only(top: 50),
                   child: ListTile(
-                    title: Text('Select Directory',
-                        style: (widget.themeData ?? Theme.of(context))
-                            .primaryTextTheme
-                            .headline6),
-                    leading: Icon(Icons.storage,
-                        color: Theme.of(context)
-                            .primaryTextTheme
-                            .headline6!
-                            .color),
+                    title: Text(
+                      'Select Directory',
+                      style: (widget.themeData ?? Theme.of(context))
+                          .primaryTextTheme
+                          .headline6,
+                    ),
+                    leading: Icon(
+                      Icons.storage,
+                      color:
+                          Theme.of(context).primaryTextTheme.headline6!.color,
+                    ),
                   ),
                 ),
               ),
             ),
-          ),
-          Flexible(
-            fit: FlexFit.loose,
-            child: Visibility(
-              visible: widget.rootDirectories.length > 1,
-              child: ListView.builder(
-                padding: EdgeInsets.zero,
-                shrinkWrap: true,
-                itemCount: _roots.length,
-                itemBuilder: (_, index) {
-                  var r = _roots.elementAt(index);
-                  return RadioListTile<int>(
-                    secondary: selectedPaths.keys
-                            .any((ee) => ee.startsWith(r.absolutePath))
-                        ? Icon(Icons.library_add_check,
-                            color: (widget.themeData ?? Theme.of(context))
-                                .primaryColorDark)
-                        : null,
-                    title: Text(r.label.toUpperCase()),
-                    value: _roots.indexOf(r),
-                    groupValue: _roots
-                        .map((e) => e.absolutePath)
-                        .toList()
-                        .indexOf(rootDirectory!.absolutePath),
-                    onChanged: (val) {
-                      rootDirectory = _roots[val!];
-                      if (widget.multiSelect == false) {
-                        selectedPaths.clear();
-                      }
-                      _setDirectory(rootDirectory!.directory);
-                      Navigator.pop(context);
-                    },
-                  );
-                },
-              ),
-            ),
-          ),
-          Visibility(
-            visible: widget.multiSelect,
-            child: Material(
-              color: (widget.themeData ?? Theme.of(context)).primaryColor,
-              child: ListTile(
-                leading: Icon(Icons.library_add_check,
-                    color: Theme.of(context).primaryTextTheme.headline6!.color),
-                title: Text(
-                  'Selected ' +
-                      (widget.fsType == FilesystemType.all
-                          ? 'Items'
-                          : widget.fsType == FilesystemType.file
-                              ? 'Files'
-                              : 'Folders') +
-                      ' (' +
-                      selectedPaths.length.toString() +
-                      ')',
-                  style: (widget.themeData ?? Theme.of(context))
-                      .primaryTextTheme
-                      .headline6,
+          if (showSelectedItems)
+            Material(
+              color: widget.themeData?.primaryColor ??
+                  Theme.of(context).primaryColor,
+              child: Padding(
+                padding: const EdgeInsets.all(20.0),
+                child: ListTile(
+                  leading: Icon(
+                    Icons.library_add_check,
+                    color: Theme.of(context).primaryTextTheme.headline6!.color,
+                  ),
+                  title: Text(
+                    'Selected ${widget.fsType == FilesystemType.all ? 'Items' : widget.fsType == FilesystemType.file ? 'Files' : 'Folders'} (${selectedPaths.length})',
+                    style: TextStyle(
+                      color:
+                          Theme.of(context).primaryTextTheme.headline6!.color,
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
                 ),
               ),
             ),
-          ),
-          Flexible(
-            fit: FlexFit.loose,
-            child: Visibility(
-              visible: widget.multiSelect,
-              child: ListView.separated(
-                padding: EdgeInsets.zero,
-                itemCount: selectedPaths.length,
-                separatorBuilder: (_, index) =>
-                    Divider(color: Colors.grey, height: 1),
-                itemBuilder: (_, index) {
-                  var pathString = selectedPaths.keys.elementAt(index);
-                  var fseType = selectedPaths.values.elementAt(index);
-                  return ListTile(
-                    leading: fseType == FileSystemEntityType.file
-                        ? FileIconHelper.getIcon(
-                            pathString,
-                            (widget.themeData ?? Theme.of(context))
-                                .primaryColor)
-                        : Icon(
-                            Icons.folder,
-                            color: widget.folderIconColor ??
-                                (widget.themeData ?? Theme.of(context))
-                                    .primaryColor,
-                            size: FileIconHelper.iconSize,
-                          ),
-                    title: FilenameText(
-                      pathString,
-                      isDirectory: fseType == FileSystemEntityType.directory,
-                    ),
-                    onTap: () {
-                      if (pathString.startsWith(rootDirectory!.absolutePath) ==
-                          false) {
-                        rootDirectory = _roots.firstWhere(
-                            (ss) => pathString.startsWith(ss.absolutePath));
-                      }
-                      _changeDirectory(Directory(
-                          pathString == rootDirectory!.absolutePath
-                              ? pathString
-                              : pt.dirname(pathString)));
-                      Navigator.pop(context);
-                    },
-                  );
-                },
-              ),
+          Expanded(
+            child: ListView.separated(
+              padding: EdgeInsets.zero,
+              itemCount: selectedPaths.length,
+              separatorBuilder: (_, index) =>
+                  Divider(color: Colors.grey, height: 1),
+              itemBuilder: (_, index) {
+                var pathString = selectedPaths.keys.elementAt(index);
+                var fseType = selectedPaths.values.elementAt(index);
+                return ListTile(
+                  leading: fseType == FileSystemEntityType.file
+                      ? FileIconHelper.getIcon(
+                          pathString,
+                          widget.themeData?.primaryColor ??
+                              Theme.of(context).primaryColor,
+                        )
+                      : Icon(
+                          Icons.folder,
+                          color: widget.folderIconColor ??
+                              (widget.themeData ?? Theme.of(context))
+                                  .primaryColor,
+                          size: FileIconHelper.iconSize,
+                        ),
+                  title: FilenameText(
+                    pathString,
+                    isDirectory: fseType == FileSystemEntityType.directory,
+                  ),
+                  onTap: () {
+                    if (!pathString.startsWith(rootDirectory!.absolutePath)) {
+                      rootDirectory = _roots.firstWhere(
+                          (ss) => pathString.startsWith(ss.absolutePath));
+                    }
+                    _changeDirectory(Directory(
+                        pathString == rootDirectory!.absolutePath
+                            ? pathString
+                            : pt.dirname(pathString)));
+                    Navigator.pop(context);
+                  },
+                );
+              },
             ),
-          ),
-          Container(
-            height: 1,
-            color: (widget.themeData ?? Theme.of(context)).primaryColor,
           ),
         ],
       ),
@@ -538,14 +517,9 @@ class _FilesystemPickerState extends State<FilesystemPicker> {
     }
 
     if (isSearching) {
-      // make sure there are only files in the list
       items.removeWhere(
           (element) => element.type == FileSystemEntityType.directory);
-      // debugPrint('List of items: ' + (items.length == 0 ? 'Empty' :
-      // items.map((e) => e.absolutePath).join(', ')) );
-      // debugPrint('Searching items: ${items.length}');
-
-      if (items.length == 0) {
+      if (items.isEmpty) {
         return Container(
           child: Center(
             child: Text(
@@ -570,6 +544,8 @@ class _FilesystemPickerState extends State<FilesystemPicker> {
         textDirection: widget.textDirection,
         rootDirectory: directory!,
         isSearching: true,
+        isTimeSorting: isTimeSorting,
+        isAlphaSorting: isAlphaSorting,
         onChange: (Directory? value) {},
         onSelect: (path, isSelected, itemType) {
           setState(() {
@@ -589,31 +565,34 @@ class _FilesystemPickerState extends State<FilesystemPicker> {
     }
 
     return FilesystemList(
-        items: items,
-        isRoot: (directory!.absolute.path == rootDirectory!.absolutePath),
-        rootDirectory: directory!,
-        multiSelect: widget.multiSelect,
-        fsType: widget.fsType,
-        folderIconColor: widget.folderIconColor,
-        allowedExtensions: widget.allowedExtensions,
-        onChange: _changeDirectory,
-        selectedItems: selectedPaths.keys,
-        themeData: widget.themeData,
-        textDirection: widget.textDirection,
-        onSelect: (path, isSelected, itemType) {
-          setState(() {
-            if (widget.multiSelect == false) {
-              selectedPaths.clear();
-              selectedPaths[path] = itemType;
+      items: items,
+      isRoot: (directory!.absolute.path == rootDirectory!.absolutePath),
+      rootDirectory: directory!,
+      multiSelect: widget.multiSelect,
+      fsType: widget.fsType,
+      folderIconColor: widget.folderIconColor,
+      allowedExtensions: widget.allowedExtensions,
+      onChange: _changeDirectory,
+      selectedItems: selectedPaths.keys,
+      themeData: widget.themeData,
+      textDirection: widget.textDirection,
+      onSelect: (path, isSelected, itemType) {
+        setState(() {
+          if (widget.multiSelect == false) {
+            selectedPaths.clear();
+            selectedPaths[path] = itemType;
+          } else {
+            if (isSelected) {
+              selectedPaths.remove(path);
             } else {
-              if (isSelected) {
-                selectedPaths.remove(path);
-              } else {
-                selectedPaths[path] = itemType;
-              }
+              selectedPaths[path] = itemType;
             }
-          });
+          }
         });
+      },
+      isTimeSorting: isTimeSorting,
+      isAlphaSorting: isAlphaSorting,
+    );
   }
 
   Widget _buildBottomButtons(BuildContext context) {
