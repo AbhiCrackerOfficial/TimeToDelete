@@ -39,7 +39,7 @@ dependencies:
   google_fonts: ^6.1.0
   permission_handler: ^11.0.1
   pick_or_save: ^2.2.4
-  flutter_sharing_intent: ^1.1.0
+  # flutter_sharing_intent: ^1.1.0
   media_scanner: ^2.1.0
   device_info_plus: ^10.1.0
   animated_search_bar: ^2.7.1

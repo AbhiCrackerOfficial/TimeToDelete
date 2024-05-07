@@ -23,6 +23,7 @@ extension ListViewExtended on ListView {
   /// widget instances when called. Avoid using a builder that returns a
   /// previously-constructed widget; if the list view's children are created in
   /// advance, or all at once when the [ListView] itself is created, it is more
+  // ignore: deprecated_new_in_comment_reference
   /// efficient to use [new ListView].
   ///
   /// {@tool sample}
