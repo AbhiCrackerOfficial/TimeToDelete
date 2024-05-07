@@ -1,17 +1,17 @@
 import 'dart:async';
 import 'dart:io';
 
-import 'package:timetodelete/filesystem_picker/lib/src/constants/enums/file_system_type.dart';
-import 'package:timetodelete/filesystem_picker/lib/src/constants/typedefs/typedefs.dart';
-import 'package:timetodelete/filesystem_picker/lib/src/utils/helpers/file_icon_helper.dart';
-import 'package:timetodelete/filesystem_picker/lib/src/utils/models/breadcrumb_item.dart';
-import 'package:timetodelete/filesystem_picker/lib/src/utils/models/file_system_mini_item.dart';
-import 'package:timetodelete/filesystem_picker/lib/src/utils/models/path_item.dart';
-import 'package:timetodelete/filesystem_picker/lib/src/utils/models/root_info.dart';
-import 'package:timetodelete/filesystem_picker/lib/src/utils/models/stack_list.dart';
-import 'package:timetodelete/filesystem_picker/lib/src/widgets/breadcrumbs.dart';
-import 'package:timetodelete/filesystem_picker/lib/src/widgets/file_system_list.dart';
-import 'package:timetodelete/filesystem_picker/lib/src/widgets/filename_text.dart';
+import 'package:timetodelete/file_system_picker/lib/src/constants/enums/file_system_type.dart';
+import 'package:timetodelete/file_system_picker/lib/src/constants/typedefs/typedefs.dart';
+import 'package:timetodelete/file_system_picker/lib/src/utils/helpers/file_icon_helper.dart';
+import 'package:timetodelete/file_system_picker/lib/src/utils/models/breadcrumb_item.dart';
+import 'package:timetodelete/file_system_picker/lib/src/utils/models/file_system_mini_item.dart';
+import 'package:timetodelete/file_system_picker/lib/src/utils/models/path_item.dart';
+import 'package:timetodelete/file_system_picker/lib/src/utils/models/root_info.dart';
+import 'package:timetodelete/file_system_picker/lib/src/utils/models/stack_list.dart';
+import 'package:timetodelete/file_system_picker/lib/src/widgets/breadcrumbs.dart';
+import 'package:timetodelete/file_system_picker/lib/src/widgets/file_system_list.dart';
+import 'package:timetodelete/file_system_picker/lib/src/widgets/filename_text.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:path/path.dart' as pt;

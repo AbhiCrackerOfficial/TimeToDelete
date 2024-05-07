@@ -1,7 +1,7 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
-import 'package:timetodelete/filesystem_picker/lib/filesystem_picker.dart';
-import 'package:timetodelete/filesystem_picker/lib/src/utils/models/file_system_mini_item.dart';
+import 'package:timetodelete/file_system_picker/lib/filesystem_picker.dart';
+import 'package:timetodelete/file_system_picker/lib/src/utils/models/file_system_mini_item.dart';
 import '../utils/functions.dart';
 
 class Home extends StatefulWidget {
@@ -86,7 +86,7 @@ class _HomeState extends State<Home> {
                     folderIconColor: Theme.of(context).highlightColor,
                   );
 
-                  print(selectedFiles.toString());
+                  print(selectedFiles?.first.name);
 
                   if (selectedFiles != null) {
                     // for (String file in selectedFiles) {
