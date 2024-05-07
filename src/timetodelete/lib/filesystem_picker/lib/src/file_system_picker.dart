@@ -1,17 +1,17 @@
 import 'dart:async';
 import 'dart:io';
 
-import 'package:filesystem_picker/src/constants/enums/file_system_type.dart';
-import 'package:filesystem_picker/src/constants/typedefs/typedefs.dart';
-import 'package:filesystem_picker/src/utils/helpers/file_icon_helper.dart';
-import 'package:filesystem_picker/src/utils/models/breadcrumb_item.dart';
-import 'package:filesystem_picker/src/utils/models/file_system_mini_item.dart';
-import 'package:filesystem_picker/src/utils/models/path_item.dart';
-import 'package:filesystem_picker/src/utils/models/root_info.dart';
-import 'package:filesystem_picker/src/utils/models/stack_list.dart';
-import 'package:filesystem_picker/src/widgets/breadcrumbs.dart';
-import 'package:filesystem_picker/src/widgets/file_system_list.dart';
-import 'package:filesystem_picker/src/widgets/filename_text.dart';
+import 'package:timetodelete/filesystem_picker/lib/src/constants/enums/file_system_type.dart';
+import 'package:timetodelete/filesystem_picker/lib/src/constants/typedefs/typedefs.dart';
+import 'package:timetodelete/filesystem_picker/lib/src/utils/helpers/file_icon_helper.dart';
+import 'package:timetodelete/filesystem_picker/lib/src/utils/models/breadcrumb_item.dart';
+import 'package:timetodelete/filesystem_picker/lib/src/utils/models/file_system_mini_item.dart';
+import 'package:timetodelete/filesystem_picker/lib/src/utils/models/path_item.dart';
+import 'package:timetodelete/filesystem_picker/lib/src/utils/models/root_info.dart';
+import 'package:timetodelete/filesystem_picker/lib/src/utils/models/stack_list.dart';
+import 'package:timetodelete/filesystem_picker/lib/src/widgets/breadcrumbs.dart';
+import 'package:timetodelete/filesystem_picker/lib/src/widgets/file_system_list.dart';
+import 'package:timetodelete/filesystem_picker/lib/src/widgets/filename_text.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:path/path.dart' as pt;
@@ -37,7 +37,7 @@ class FilesystemPicker extends StatefulWidget {
   /// * [allowedExtensions] specifies a list of file extensions that will be displayed for selection, if empty - files with any extension are displayed. Example: `['.jpg', '.jpeg']`
   /// * [fileTileSelectMode] specifies how to files can be selected (either tapping on the whole tile or only on trailing button). (default depends on [fsType])
   /// * [requestPermission] if specified will be called on initialization to request storage permission. callers can use e.g. [permission_handler](https://pub.dev/packages/permission_handler).
-  static Future<Iterable<String>?> open({
+  static Future<Iterable<FileSystemMiniItem>?> open({
     required BuildContext context,
     required List<Directory> rootDirectories,
     List<String>? rootNames,
@@ -53,7 +53,7 @@ class FilesystemPicker extends StatefulWidget {
     ThemeData? themeData,
     TextDirection? textDirection,
   }) async {
-    return Navigator.of(context).push<Iterable<String>>(
+    return Navigator.of(context).push<Iterable<FileSystemMiniItem>>(
       MaterialPageRoute(builder: (BuildContext context) {
         return FilesystemPicker(
           rootDirectories: rootDirectories,
@@ -628,10 +628,6 @@ class _FilesystemPickerState extends State<FilesystemPicker> {
             ),
             Expanded(
                 child: TextButton.icon(
-              style: TextButton.styleFrom(
-                  // primary: AppBarTheme.of(context).textTheme?.headline6?.color ??
-                  //     Theme.of(context).primaryTextTheme.headline6?.color,
-                  ),
               icon: Icon(Icons.check_circle),
               label: (widget.pickText != null)
                   ? Text(widget.pickText!)
@@ -639,7 +635,11 @@ class _FilesystemPickerState extends State<FilesystemPicker> {
               onPressed: (!permissionRequesting &&
                       permissionAllowed &&
                       selectedPaths.isNotEmpty)
-                  ? () => Navigator.pop(context, selectedPaths.keys)
+                  ? () => Navigator.pop(
+                      context, // return values in FileSystemMiniItem
+                      selectedPaths.entries
+                          .map((e) => FileSystemMiniItem(e.key, e.value))
+                          .toList())
                   : null,
             ))
           ],

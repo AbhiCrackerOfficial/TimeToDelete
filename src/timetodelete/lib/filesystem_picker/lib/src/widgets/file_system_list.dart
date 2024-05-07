@@ -3,7 +3,7 @@ import 'dart:async';
 import 'dart:io';
 
 // External packages
-import 'package:filesystem_picker/src/utils/models/file_system_mini_item.dart';
+import 'package:timetodelete/filesystem_picker/lib/src/utils/models/file_system_mini_item.dart';
 import 'package:flutter/material.dart';
 import 'package:path/path.dart' as path;
 

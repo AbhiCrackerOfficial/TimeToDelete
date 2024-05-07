@@ -1,6 +1,7 @@
 import 'dart:io';
-import 'package:filesystem_picker/filesystem_picker.dart';
 import 'package:flutter/material.dart';
+import 'package:timetodelete/filesystem_picker/lib/filesystem_picker.dart';
+import 'package:timetodelete/filesystem_picker/lib/src/utils/models/file_system_mini_item.dart';
 import '../utils/functions.dart';
 
 class Home extends StatefulWidget {
@@ -71,7 +72,8 @@ class _HomeState extends State<Home> {
               ),
               ElevatedButton(
                 onPressed: () async {
-                  Iterable<String>? selectedFiles = await FilesystemPicker.open(
+                  Iterable<FileSystemMiniItem>? selectedFiles =
+                      await FilesystemPicker.open(
                     title: 'Select files',
                     context: context,
                     multiSelect: true,
@@ -84,48 +86,12 @@ class _HomeState extends State<Home> {
                     folderIconColor: Theme.of(context).highlightColor,
                   );
 
+                  print(selectedFiles.toString());
+
                   if (selectedFiles != null) {
-                    for (String file in selectedFiles) {
-                      File f = File(file);
-                      f.delete().then((value) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
-                            content: Text('Files Deleted Successfully'),
-                            duration: Duration(seconds: 1),
-                          ),
-                        );
-                      });
-                    }
-
-                    // String? rpath = await FilesystemPicker.open(
-                    //   title: 'Select file',
-                    //   context: context,
-                    //   rootDirectory: Directory('/storage/emulated/0/'),
-                    //   fsType: FilesystemType.file,
-                    //   fileTileSelectMode: FileTileSelectMode.wholeTile,
-                    //   allowedExtensions: null,
-                    //   requestPermission: () async {
-                    //     return await storagePermission();
-                    //   },
-                    // );
-
-                    // if (rpath != null) {
-                    //   File file = File(rpath);
-
-                    //   ScaffoldMessenger.of(context).showSnackBar(
-                    //     const SnackBar(
-                    //       content: Text('Files Picked Successfully'),
-                    //       duration: Duration(seconds: 1),
-                    //     ),
-                    //   );
-
-                    //   // if (file.existsSync()) {
-                    //   //   debugPrint("FILE EXISTS");
-                    //   // } else {
-                    //   //   debugPrint("FILE DOES NOT EXIST");
-                    //   // }
-
-                    //   file.delete().then((value) {
+                    // for (String file in selectedFiles) {
+                    //   File f = File(file);
+                    //   f.delete().then((value) {
                     //     ScaffoldMessenger.of(context).showSnackBar(
                     //       const SnackBar(
                     //         content: Text('Files Deleted Successfully'),
@@ -133,12 +99,7 @@ class _HomeState extends State<Home> {
                     //       ),
                     //     );
                     //   });
-
-                    //   // if (file.existsSync()) {
-                    //   //   debugPrint("FILE EXISTS");
-                    //   // } else {
-                    //   //   debugPrint("FILE DOES NOT EXIST");
-                    //   // }
+                    // }
                   }
                 },
                 style: ElevatedButton.styleFrom(
