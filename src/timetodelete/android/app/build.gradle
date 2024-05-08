@@ -24,7 +24,7 @@ if (flutterVersionName == null) {
 
 android {
     namespace "com.abhicracker.timetodelete"
-    compileSdkVersion "android-33"
+    compileSdkVersion "android-34"
     ndkVersion flutter.ndkVersion
 
     compileOptions {

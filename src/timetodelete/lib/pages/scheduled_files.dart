@@ -8,12 +8,18 @@ class Files extends StatefulWidget {
 }
 
 class _FilesState extends State<Files> {
+  // late _db;
   bool isSearchBarVisible = false;
 
   void toggleSearchBarVisibility() {
     setState(() {
       isSearchBarVisible = !isSearchBarVisible;
     });
+  }
+
+  @override
+  void initState() {
+    super.initState();
   }
 
   @override
@@ -42,7 +48,8 @@ class _FilesState extends State<Files> {
           if (isSearchBarVisible)
             SearchBar(
               hintText: "Search for files",
-              shadowColor: MaterialStateColor.resolveWith((states) => Colors.transparent),
+              shadowColor: MaterialStateColor.resolveWith(
+                  (states) => Colors.transparent),
               onSubmitted: (value) {
                 // search for the file
               },

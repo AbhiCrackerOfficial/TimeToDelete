@@ -81,6 +81,7 @@ class _HomeState extends State<Home> {
                     fsType: FilesystemType.file,
                     allowedExtensions: null,
                     requestPermission: () async {
+                      
                       return await storagePermission();
                     },
                     folderIconColor: Theme.of(context).highlightColor,
@@ -89,17 +90,19 @@ class _HomeState extends State<Home> {
                   print(selectedFiles?.first.name);
 
                   if (selectedFiles != null) {
-                    // for (String file in selectedFiles) {
-                    //   File f = File(file);
-                    //   f.delete().then((value) {
-                    //     ScaffoldMessenger.of(context).showSnackBar(
-                    //       const SnackBar(
-                    //         content: Text('Files Deleted Successfully'),
-                    //         duration: Duration(seconds: 1),
-                    //       ),
-                    //     );
-                    //   });
-                    // }
+                    List<String> files =
+                        selectedFiles.map((file) => file.absolutePath).toList();
+                    for (String file in files) {
+                      File f = File(file);
+                      f.delete().then((value) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text('Files Deleted Successfully'),
+                            duration: Duration(seconds: 1),
+                          ),
+                        );
+                      });
+                    }
                   }
                 },
                 style: ElevatedButton.styleFrom(

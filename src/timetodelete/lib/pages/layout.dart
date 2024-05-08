@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:timetodelete/data/theme_data.dart';
 import 'package:timetodelete/pages/home.dart';
-import 'package:timetodelete/pages/files.dart';
+import 'package:timetodelete/pages/scheduled_files.dart';
 import 'package:timetodelete/pages/settings.dart';
-// import 'package:flutter_sharing_intent/flutter_sharing_intent.dart';
 
 class Layout extends StatefulWidget {
   const Layout({Key? key}) : super(key: key);
@@ -14,27 +13,7 @@ class Layout extends StatefulWidget {
 
 class _LayoutState extends State<Layout> {
   int _selectedIndex = 0;
-  // String _sharedPath = '';
-  // bool _isShared = false;
   final PageController _pageController = PageController();
-
-  @override
-  // void initState() {
-  //   super.initState();
-  //   // // Handle shared intents here if the app is opened from a shared intent
-  //   // FlutterSharingIntent().getInitialSharing().then((value) {
-  //   //   if (value.isNotEmpty) {
-  //   //     _handleSharedIntent(value[0].value as String);
-
-  //   //   }
-  //   // });
-  // }
-
-  // void _handleSharedIntent(String path) {
-  //   _sharedPath = path;
-  //   print("Shared Intent: $path");
-    
-  // }
 
   @override
   Widget build(BuildContext context) {
