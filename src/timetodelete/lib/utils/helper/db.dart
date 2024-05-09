@@ -33,6 +33,11 @@ class DbHelper {
     }
   }
 
+  // Create a function that tells if db is opened or not returns true or false
+  Future<bool> get isOpen async {
+    return _db.isOpen;
+  }  
+
   // Create the necessary tables upon database creation
   Future<void> _onCreate(Database db, int version) async {
     await db.execute('''

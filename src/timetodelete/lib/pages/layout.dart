@@ -50,7 +50,7 @@ class _LayoutState extends State<Layout> {
           onPageChanged: (value) => setState(() => _selectedIndex = value),
           children: const <Widget>[
             Home(),
-            Files(),
+            ScheduledFiles(),
             Settings(),
           ],
         ),

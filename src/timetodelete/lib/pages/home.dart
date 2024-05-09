@@ -2,6 +2,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:timetodelete/file_system_picker/lib/filesystem_picker.dart';
 import 'package:timetodelete/file_system_picker/lib/src/utils/models/file_system_mini_item.dart';
+import 'package:timetodelete/pages/scheduler.dart';
 import '../utils/functions.dart';
 
 class Home extends StatefulWidget {
@@ -81,7 +82,6 @@ class _HomeState extends State<Home> {
                     fsType: FilesystemType.file,
                     allowedExtensions: null,
                     requestPermission: () async {
-                      
                       return await storagePermission();
                     },
                     folderIconColor: Theme.of(context).highlightColor,
@@ -90,19 +90,29 @@ class _HomeState extends State<Home> {
                   print(selectedFiles?.first.name);
 
                   if (selectedFiles != null) {
-                    List<String> files =
-                        selectedFiles.map((file) => file.absolutePath).toList();
-                    for (String file in files) {
-                      File f = File(file);
-                      f.delete().then((value) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
-                            content: Text('Files Deleted Successfully'),
-                            duration: Duration(seconds: 1),
-                          ),
-                        );
-                      });
-                    }
+                    showModalBottomSheet(
+                      enableDrag: true,
+                      // isScrollControlled: true,
+                      
+                      context: context,
+                      builder: (BuildContext context) {
+                        return Scheduler(selectedFiles: selectedFiles);
+                      },
+                    );
+
+                    // List<String> files =
+                    //     selectedFiles.map((file) => file.absolutePath).toList();
+                    // for (String file in files) {
+                    //   File f = File(file);
+                    //   f.delete().then((value) {
+                    //     ScaffoldMessenger.of(context).showSnackBar(
+                    //       const SnackBar(
+                    //         content: Text('Files Deleted Successfully'),
+                    //         duration: Duration(seconds: 1),
+                    //       ),
+                    //     );
+                    //   });
+                    // }
                   }
                 },
                 style: ElevatedButton.styleFrom(

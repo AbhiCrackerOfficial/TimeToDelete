@@ -1,14 +1,18 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:sqflite/sqflite.dart';
+import 'package:timetodelete/provider/databaseProvider.dart';
+import 'package:timetodelete/utils/helper/db.dart';
 
-class Files extends StatefulWidget {
-  const Files({super.key});
+class ScheduledFiles extends ConsumerStatefulWidget {
+  const ScheduledFiles({Key? key}) : super(key: key);
 
   @override
-  State<Files> createState() => _FilesState();
+  ConsumerState<ScheduledFiles> createState() => _ScheduledFilesState();
 }
 
-class _FilesState extends State<Files> {
-  // late _db;
+class _ScheduledFilesState extends ConsumerState<ScheduledFiles> {
+  DbHelper? _db; // Make it nullable since it's initialized asynchronously
   bool isSearchBarVisible = false;
 
   void toggleSearchBarVisibility() {
@@ -20,6 +24,21 @@ class _FilesState extends State<Files> {
   @override
   void initState() {
     super.initState();
+    _initializeDB();
+  }
+
+  Future<void> _initializeDB() async {
+  _db = await ref.read(databaseProvider.future);
+  await _db?.db;
+  
+  debugPrint('Database initialized: ${_db?.isOpen}');
+}
+
+
+  @override
+  void dispose() async {
+    await _db?.close();
+    super.dispose();
   }
 
   @override
@@ -30,13 +49,13 @@ class _FilesState extends State<Files> {
         actions: <Widget>[
           IconButton(
             icon: const Icon(Icons.sort_outlined),
-            onPressed: () {},
+            onPressed: () {
+              debugPrint(_db?.isOpen.toString() ?? 'Database is not initialized');
+            },
           ),
           IconButton(
             icon: const Icon(Icons.search),
-            onPressed: () {
-              toggleSearchBarVisibility();
-            },
+            onPressed: toggleSearchBarVisibility,
           ),
         ],
       ),
