@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:sqflite/sqflite.dart';
 import 'package:timetodelete/file_system_picker/lib/src/utils/models/file_system_mini_item.dart';
 import 'package:timetodelete/provider/databaseProvider.dart';
+import 'package:timetodelete/utils/helper/db.dart';
 
 class Scheduler extends ConsumerStatefulWidget {
 
@@ -15,19 +15,12 @@ class Scheduler extends ConsumerStatefulWidget {
 }
 
 class _SchedulerState extends ConsumerState<Scheduler> {
-  late final _db;
+  late DBHelper _db;
 
   @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    // _db = ref.watch(databaseProvider);
-    
-  }
-
-  @override
-  void dispose() {
-    super.dispose();
-    _db.close();
+  void initState() {
+    super.initState();
+    _db = ref.read(databaseProvider);
   }
 
   @override

@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:sqflite/sqflite.dart';
 import 'package:timetodelete/provider/databaseProvider.dart';
 import 'package:timetodelete/utils/helper/db.dart';
 
@@ -12,7 +11,7 @@ class ScheduledFiles extends ConsumerStatefulWidget {
 }
 
 class _ScheduledFilesState extends ConsumerState<ScheduledFiles> {
-  DbHelper? _db; // Make it nullable since it's initialized asynchronously
+  late DBHelper _db;
   bool isSearchBarVisible = false;
 
   void toggleSearchBarVisibility() {
@@ -24,21 +23,8 @@ class _ScheduledFilesState extends ConsumerState<ScheduledFiles> {
   @override
   void initState() {
     super.initState();
-    _initializeDB();
-  }
-
-  Future<void> _initializeDB() async {
-  _db = await ref.read(databaseProvider.future);
-  await _db?.db;
-  
-  debugPrint('Database initialized: ${_db?.isOpen}');
-}
-
-
-  @override
-  void dispose() async {
-    await _db?.close();
-    super.dispose();
+    _db = ref.read(databaseProvider);
+    debugPrint('Database initialized: ${_db.isOpen}');
   }
 
   @override
@@ -49,9 +35,7 @@ class _ScheduledFilesState extends ConsumerState<ScheduledFiles> {
         actions: <Widget>[
           IconButton(
             icon: const Icon(Icons.sort_outlined),
-            onPressed: () {
-              debugPrint(_db?.isOpen.toString() ?? 'Database is not initialized');
-            },
+            onPressed: () {},
           ),
           IconButton(
             icon: const Icon(Icons.search),
