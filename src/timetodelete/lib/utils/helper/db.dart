@@ -55,8 +55,6 @@ class DBHelper {
       }
       return {false: 'Failed For This File'};
     }
-
-    
   }
 
   // Retrieve all rows from the 'scheduled_files' table
@@ -73,6 +71,10 @@ class DBHelper {
       where: 'id = ?',
       whereArgs: [id],
     );
+
+    // output will be like this:
+    // 1: success
+    // 0: failed
   }
 
   // Update a row in the 'scheduled_files' table based on id

@@ -2,9 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:timetodelete/provider/databaseProvider.dart';
 import 'package:timetodelete/utils/helper/db.dart';
-import 'package:timetodelete/widgets/scheduledfile_tile.dart';
 
-/// Widget to display a list of scheduled files.
 class ScheduledFiles extends ConsumerStatefulWidget {
   const ScheduledFiles({Key? key}) : super(key: key);
 
@@ -12,12 +10,13 @@ class ScheduledFiles extends ConsumerStatefulWidget {
   ConsumerState<ScheduledFiles> createState() => _ScheduledFilesState();
 }
 
-/// State class for [ScheduledFiles] widget.
 class _ScheduledFilesState extends ConsumerState<ScheduledFiles> {
   late final DBHelper _db;
   bool isSearchBarVisible = false;
+  SearchController searchController = SearchController();
+  late List<Map<String, dynamic>> files;
+  late List<Map<String, dynamic>> filteredFiles;
 
-  /// Toggles the visibility of the search bar.
   void toggleSearchBarVisibility() {
     setState(() {
       isSearchBarVisible = !isSearchBarVisible;
@@ -29,13 +28,48 @@ class _ScheduledFilesState extends ConsumerState<ScheduledFiles> {
     super.initState();
     _db = ref.read(databaseProvider);
     debugPrint('Database initialized: ${_db.isOpen}');
+    fetchData();
   }
 
-  /// Fetches the list of scheduled files from the database.
-  Future<List<Map<String, dynamic>>> getFiles() async {
+  Future<void> fetchData() async {
     final db = await _db.database;
-    final List<Map<String, dynamic>> files = await db.query('scheduled_files');
-    return files;
+    files = await db.query('scheduled_files');
+    filteredFiles = List.from(files);
+    setState(() {});
+  }
+
+  void deleteFile(Map<String, dynamic> file) {
+    setState(() {
+      _db.delete(file['id']).then((value) {
+        if (value == 1) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('${file['name']} deleted successfully'),
+            ),
+          );
+          fetchData(); // Refetch data after deletion
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('Failed to delete ${file['name']}'),
+            ),
+          );
+        }
+      });
+    });
+  }
+
+  void filterFiles(String query) {
+    setState(() {
+      filteredFiles = files
+          .where((file) =>
+              file['name'].toLowerCase().contains(query.toLowerCase()) ||
+              file['path'].toLowerCase().contains(query.toLowerCase()) ||
+              file['scheduled_time']
+                  .toLowerCase()
+                  .contains(query.toLowerCase()))
+          .toList();
+    });
   }
 
   @override
@@ -46,9 +80,7 @@ class _ScheduledFilesState extends ConsumerState<ScheduledFiles> {
         actions: <Widget>[
           IconButton(
               onPressed: () {
-                setState(() {
-                  // TODO: Implement refresh functionality
-                });
+                fetchData();
               },
               icon: const Icon(Icons.refresh)),
           IconButton(
@@ -71,41 +103,31 @@ class _ScheduledFilesState extends ConsumerState<ScheduledFiles> {
               hintText: "Search for files",
               shadowColor: MaterialStateColor.resolveWith(
                   (states) => Colors.transparent),
+              controller: searchController,
               onSubmitted: (value) {
-                // TODO: Implement search functionality
+                filterFiles(value);
               },
               onChanged: (value) {
-                // TODO: Implement filter functionality
+                filterFiles(value);
               },
             ),
+          const SizedBox(height: 10),
           Expanded(
-            child: FutureBuilder(
-              future: getFiles(),
-              builder: (BuildContext context,
-                  AsyncSnapshot<List<Map<String, dynamic>>> snapshot) {
-                if (snapshot.connectionState == ConnectionState.waiting) {
-                  return Center(
-                    child: CircularProgressIndicator(),
-                  );
-                } else if (snapshot.hasError) {
-                  return Center(
-                    child: Text('Error: ${snapshot.error}'),
-                  );
-                } else {
-                  final List<Map<String, dynamic>> files = snapshot.data!;
-                  return ListView.builder(
-                    itemCount: files.length,
-                    itemBuilder: (BuildContext context, int index) {
-                      final file = files[index];
-                      return ScheduledFileTile(
-                        id: file['id'],
-                        name: file['name'],
-                        path: file['path'],
-                        scheduledTime: file['scheduled_time'],
-                      );
+            child: ListView.builder(
+              itemCount: filteredFiles.length,
+              itemBuilder: (BuildContext context, int index) {
+                final file = filteredFiles.elementAt(index);
+                return ListTile(
+                  title: Text(file['name']),
+                  subtitle: Text(file['path']),
+                  leading: Text(file['scheduled_time'].substring(0, 16)),
+                  trailing: IconButton(
+                    icon: const Icon(Icons.cancel_outlined),
+                    onPressed: () {
+                      deleteFile(file);
                     },
-                  );
-                }
+                  ),
+                );
               },
             ),
           ),
