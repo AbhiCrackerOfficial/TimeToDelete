@@ -30,9 +30,8 @@ class DBHelper {
         await db.execute('''
           CREATE TABLE scheduled_files (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
-            path TEXT,
             name TEXT,
-            extension TEXT,
+            path TEXT UNIQUE,
             scheduled_time TEXT
           )
         ''');
@@ -41,9 +40,23 @@ class DBHelper {
   }
 
   // Insert a row into the 'scheduled_files' table
-  Future<int> insert(Map<String, dynamic> row) async {
-    final dbClient = await database;
-    return await dbClient.insert('scheduled_files', row);
+  Future<Map<bool, String>> insert(Map<String, dynamic> row) async {
+    try {
+      final dbClient = await database;
+      int res = await dbClient.insert('scheduled_files', row);
+      if (res != 0) {
+        return {true: 'Success'};
+      } else {
+        return {false: 'Failed'};
+      }
+    } catch (e) {
+      if (e.toString().contains('UNIQUE constraint failed')) {
+        return {false: 'File already scheduled for deletion'};
+      }
+      return {false: 'Failed For This File'};
+    }
+
+    
   }
 
   // Retrieve all rows from the 'scheduled_files' table
@@ -104,3 +117,19 @@ class DBHelper {
     await dbClient.execute('DELETE FROM scheduled_files');
   }
 }
+
+
+// =============== FAQ =============== //
+// what type of input is expected for the 'row' parameter?
+// The 'row' parameter is a Map<String, dynamic> object that represents a row in the 'scheduled_files' table.
+// The keys in the map represent the column names in the table, and the values represent the corresponding column values.
+// The 'row' parameter should contain the following keys:
+// - 'path': The path of the file to be deleted.
+// - 'name': The name of the file to be deleted.
+// - 'scheduled_time': The time at which the file should be deleted.
+// row should be like this:
+// {
+//   'path': '/path/to/file',
+//   'name': 'file.txt',
+//   'scheduled_time': '2022-01-01T12:00:00Z',
+// }

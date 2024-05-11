@@ -99,20 +99,6 @@ class _HomeState extends State<Home> {
                       },
                       useRootNavigator: true,
                     );
-
-                    // List<String> files =
-                    //     selectedFiles.map((file) => file.absolutePath).toList();
-                    // for (String file in files) {
-                    //   File f = File(file);
-                    //   f.delete().then((value) {
-                    //     ScaffoldMessenger.of(context).showSnackBar(
-                    //       const SnackBar(
-                    //         content: Text('Files Deleted Successfully'),
-                    //         duration: Duration(seconds: 1),
-                    //       ),
-                    //     );
-                    //   });
-                    // }
                   }
                 },
                 style: ElevatedButton.styleFrom(

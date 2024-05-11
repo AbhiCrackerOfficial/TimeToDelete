@@ -60,7 +60,6 @@ class _SchedulerState extends ConsumerState<Scheduler> {
             itemBuilder: (BuildContext context, int index) {
               final file = widget.selectedFiles.elementAt(index);
               return ListTile(
-                // change the tile color to apps primary color
                 tileColor: Theme.of(context).hoverColor,
                 title: Text(file.name),
                 subtitle: isListShown ? Text(file.absolutePath) : null,
@@ -139,13 +138,53 @@ class _SchedulerState extends ConsumerState<Scheduler> {
     );
   }
 
+  bool validateDateTime() {
+    return dateTime != null && dateTime!.isAfter(DateTime.now());
+  }
+
   void _saveScheduledDeletion() async {
-    if (dateTime != null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Scheduled for deletion')),
-      );
+    if (validateDateTime()) {
+      for (final file in widget.selectedFiles) {
+        Map<bool, String> res = await _db.insert({
+          'name': file.name,
+          'path': file.absolutePath,
+          'scheduled_time': dateTime?.toIso8601String(),
+        });
+        if (res.keys.first) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+                content: Text('${file.name} scheduled for deletion'),
+                duration: const Duration(seconds: 1)),
+          );
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+                content: Text('${file.name} already scheduled for deletion'),
+                duration: const Duration(seconds: 1)),
+          );
+        }
+      }
       Navigator.of(context).pop();
+    } else {
+      // build and show a alert
+      await showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: const Text('Invalid Date/Time'),
+            content: const Text(
+                'Please select a date and time in the future to schedule the deletion.'),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.of(context).pop(),
+                child: const Text('OK'),
+              ),
+            ],
+          );
+        },
+      );
     }
+
   }
 
   void _toggleSelectedFilesList() {
