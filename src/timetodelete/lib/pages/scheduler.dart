@@ -7,7 +7,7 @@ import 'package:timetodelete/utils/helper/db.dart';
 class Scheduler extends ConsumerStatefulWidget {
   final Iterable<FileSystemMiniItem> selectedFiles;
 
-  Scheduler({Key? key, required this.selectedFiles}) : super(key: key);
+  const Scheduler({Key? key, required this.selectedFiles}) : super(key: key);
 
   @override
   ConsumerState<Scheduler> createState() => _SchedulerState();
@@ -62,8 +62,8 @@ class _SchedulerState extends ConsumerState<Scheduler> {
               return ListTile(
                 // change the tile color to apps primary color
                 tileColor: Theme.of(context).hoverColor,
-                title: Text(file.name), 
-                subtitle: isListShown ? Text(file.absolutePath) : null, 
+                title: Text(file.name),
+                subtitle: isListShown ? Text(file.absolutePath) : null,
               );
             },
           ),
@@ -75,7 +75,8 @@ class _SchedulerState extends ConsumerState<Scheduler> {
   Widget _buildDatePicker(BuildContext context) {
     return ListTile(
       title: const Text('Date'),
-      subtitle: Text(dateTime?.toIso8601String().substring(0, 10) ?? 'No date selected'),
+      subtitle: Text(
+          dateTime?.toIso8601String().substring(0, 10) ?? 'No date selected'),
       onTap: () async {
         final date = await showDatePicker(
           context: context,
@@ -101,7 +102,8 @@ class _SchedulerState extends ConsumerState<Scheduler> {
   Widget _buildTimePicker(BuildContext context) {
     return ListTile(
       title: const Text('Time'),
-      subtitle: Text(dateTime?.toIso8601String().substring(11, 16) ?? 'No time selected'),
+      subtitle: Text(
+          dateTime?.toIso8601String().substring(11, 16) ?? 'No time selected'),
       onTap: () async {
         final time = await showTimePicker(
           context: context,
@@ -129,7 +131,9 @@ class _SchedulerState extends ConsumerState<Scheduler> {
         children: [
           Expanded(child: _buildDatePicker(context)),
           Expanded(child: _buildTimePicker(context)),
-          ElevatedButton(onPressed: _saveScheduledDeletion, child: const Text('Save')),
+          ElevatedButton(
+              onPressed: _saveScheduledDeletion, child: const Text('Save')),
+          const SizedBox(width: 10),
         ],
       ),
     );
@@ -137,7 +141,6 @@ class _SchedulerState extends ConsumerState<Scheduler> {
 
   void _saveScheduledDeletion() async {
     if (dateTime != null) {
-      // Implement the actual deletion logic using your DBHelper
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Scheduled for deletion')),
       );
@@ -147,7 +150,8 @@ class _SchedulerState extends ConsumerState<Scheduler> {
 
   void _toggleSelectedFilesList() {
     setState(() {
-      icon = isListShown ? const Icon(Icons.info_outline) : const Icon(Icons.info);
+      icon =
+          isListShown ? const Icon(Icons.info_outline) : const Icon(Icons.info);
       isListShown = !isListShown;
     });
   }

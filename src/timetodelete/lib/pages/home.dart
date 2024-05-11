@@ -93,13 +93,11 @@ class _HomeState extends State<Home> {
                     showModalBottomSheet(
                       context: context,
                       enableDrag: true,
-                      // isScrollControlled: true,
                       isDismissible: false,
                       builder: (BuildContext context) {
                         return Scheduler(selectedFiles: selectedFiles);
                       },
                       useRootNavigator: true,
-
                     );
 
                     // List<String> files =
