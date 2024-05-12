@@ -68,23 +68,25 @@ class StyledText extends StatelessWidget {
 }
 
 Future<bool> checkAndHandleBatteryOptimization() async {
-  bool? isAutoStartEnabled =
-      await DisableBatteryOptimization.isAutoStartEnabled;
+  bool? isAutoStartEnabled = await DisableBatteryOptimization.isAutoStartEnabled;
 
-  if (isAutoStartEnabled!) {
+  if (isAutoStartEnabled ?? false) {
     await DisableBatteryOptimization.showDisableBatteryOptimizationSettings();
   }
 
-  bool? isBatteryOptimizationDisabled =
-      await DisableBatteryOptimization.isBatteryOptimizationDisabled;
+  bool? isBatteryOptimizationDisabled = await DisableBatteryOptimization.isBatteryOptimizationDisabled;
 
-  await DisableBatteryOptimization
-      .showDisableManufacturerBatteryOptimizationSettings(
-          "Your device has additional battery optimization",
-          "Follow the steps and disable the optimizations to allow smooth functioning of this app");
+  if (!(isBatteryOptimizationDisabled ?? false)) {
+    bool? showManufacturerSettings = await DisableBatteryOptimization
+        .showDisableManufacturerBatteryOptimizationSettings(
+            "Your device has additional battery optimization",
+            "Follow the steps and disable the optimizations to allow smooth functioning of this app");
 
-  return isBatteryOptimizationDisabled!;
+    return showManufacturerSettings ?? false;
+  }
+  return isBatteryOptimizationDisabled ?? false;
 }
+
 
 Future<bool> storagePermission() async {
   final DeviceInfoPlugin info = DeviceInfoPlugin();

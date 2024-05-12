@@ -16,99 +16,113 @@ class _HomeState extends State<Home> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBar(
-          title: const Text('TimeToDelete', style: TextStyle(fontSize: 28.0)),
-          actions: <Widget>[
-            IconButton(
-                onPressed: () {
-                  // create a dialog box
-                  showDialog(
-                    context: context,
-                    builder: (BuildContext context) {
-                      return AlertDialog(
-                        title: const Text('About TimeToDelete'),
-                        content: const Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          mainAxisSize: MainAxisSize.min,
-                          children: <Widget>[
-                            Text(
-                              'TimeToDelete is a simple app that allows you to schedule the deletion of files from your device automatically.',
-                            ),
-                            SizedBox(height: 10),
-                            Text(
-                              'Developer: AbhiCracker',
-                              style: TextStyle(fontWeight: FontWeight.bold),
-                            ),
-                            SizedBox(height: 10),
-                            Text(
-                              'This app is currently under development.',
-                            ),
-                          ],
-                        ),
-                        actions: <Widget>[
-                          TextButton(
-                            onPressed: () {
-                              Navigator.of(context).pop();
-                            },
-                            child: const Text('Close'),
-                          ),
-                        ],
-                      );
-                    },
-                  );
-                },
-                icon: const Icon(Icons.info)),
+      appBar: AppBar(
+        title: const Text('TimeToDelete', style: TextStyle(fontSize: 28.0)),
+        actions: <Widget>[
+          IconButton(
+            onPressed: _showAboutDialog,
+            icon: const Icon(Icons.info),
+          ),
+        ],
+      ),
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            const Text(
+              'Welcome to TimeToDelete',
+              style: TextStyle(fontSize: 24.0),
+            ),
+            const SizedBox(
+              height: 20,
+            ),
+            _buildAddButton(context),
           ],
         ),
-        body: Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
+      ),
+    );
+  }
+
+  void _showAboutDialog() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('About TimeToDelete'),
+          content: const Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
             children: <Widget>[
-              const Text(
-                'Welcome to TimeToDelete',
-                style: TextStyle(fontSize: 24.0),
+              Text(
+                'TimeToDelete is a simple app that allows you to schedule the deletion of files from your device automatically.',
               ),
-              const SizedBox(
-                height: 20,
+              SizedBox(height: 10),
+              Text(
+                'Developer: AbhiCracker',
+                style: TextStyle(fontWeight: FontWeight.bold),
               ),
-              ElevatedButton(
-                onPressed: () async {
-                  Iterable<FileSystemMiniItem>? selectedFiles =
-                      await FilesystemPicker.open(
-                    title: 'Select files',
-                    context: context,
-                    multiSelect: true,
-                    rootDirectories: [Directory('/storage/emulated/0/')],
-                    fsType: FilesystemType.file,
-                    allowedExtensions: null,
-                    requestPermission: () async {
-                      return await storagePermission();
-                    },
-                    folderIconColor: Theme.of(context).highlightColor,
-                  );
-
-                  print(selectedFiles?.first.name);
-
-                  if (selectedFiles != null) {
-                    showModalBottomSheet(
-                      context: context,
-                      enableDrag: true,
-                      isDismissible: false,
-                      builder: (BuildContext context) {
-                        return Scheduler(selectedFiles: selectedFiles);
-                      },
-                      useRootNavigator: true,
-                    );
-                  }
-                },
-                style: ElevatedButton.styleFrom(
-                  minimumSize: const Size(200, 80),
-                  textStyle: const TextStyle(fontSize: 20),
-                ),
-                child: const Text('Select File'),
+              SizedBox(height: 10),
+              Text(
+                'This app is currently under development.',
               ),
             ],
           ),
-        ));
+          actions: <Widget>[
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: const Text('Close'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  Widget _buildAddButton(BuildContext context) {
+    return IconButton(
+      icon: const Icon(
+        Icons.add,
+      ),
+      onPressed: () async {
+        Iterable<FileSystemMiniItem>? selectedFiles = await FilesystemPicker.open(
+          title: 'Select files',
+          context: context,
+          multiSelect: true,
+          rootDirectories: [Directory('/storage/emulated/0/')],
+          fsType: FilesystemType.file,
+          allowedExtensions: null,
+          requestPermission: () async {
+            return await storagePermission();
+          },
+          folderIconColor: Theme.of(context).highlightColor,
+        );
+
+        print(selectedFiles?.first.name);
+
+        if (selectedFiles != null) {
+          _showSchedulerBottomSheet(selectedFiles);
+        }
+      },
+      iconSize: 50.0,
+      style: ElevatedButton.styleFrom(
+        minimumSize: const Size(200, 80),
+        textStyle: const TextStyle(fontSize: 20),
+        backgroundColor: ThemeData.dark().hoverColor,
+      ),
+    );
+  }
+
+  void _showSchedulerBottomSheet(Iterable<FileSystemMiniItem> selectedFiles) {
+    showModalBottomSheet(
+      context: context,
+      enableDrag: true,
+      isDismissible: false,
+      builder: (BuildContext context) {
+        return Scheduler(selectedFiles: selectedFiles);
+      },
+      useRootNavigator: true,
+    );
   }
 }

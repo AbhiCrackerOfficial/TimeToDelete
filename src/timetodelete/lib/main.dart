@@ -10,7 +10,7 @@ Future<bool> isBatteryOptimizationDisable() async {
   if (isBatteryOptimizationDisabled) {
     return true;
   } else {
-    return isBatteryOptimizationDisable();
+    return false;
   }
 }
 

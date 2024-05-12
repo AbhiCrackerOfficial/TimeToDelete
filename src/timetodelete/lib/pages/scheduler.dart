@@ -166,7 +166,6 @@ class _SchedulerState extends ConsumerState<Scheduler> {
       }
       Navigator.of(context).pop();
     } else {
-      // build and show a alert
       await showDialog(
         context: context,
         builder: (BuildContext context) {
@@ -184,7 +183,6 @@ class _SchedulerState extends ConsumerState<Scheduler> {
         },
       );
     }
-
   }
 
   void _toggleSelectedFilesList() {

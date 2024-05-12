@@ -13,22 +13,17 @@ class ScheduledFiles extends ConsumerStatefulWidget {
 class _ScheduledFilesState extends ConsumerState<ScheduledFiles> {
   late final DBHelper _db;
   bool isSearchBarVisible = false;
-  SearchController searchController = SearchController();
-  late List<Map<String, dynamic>> files;
-  late List<Map<String, dynamic>> filteredFiles;
-
-  void toggleSearchBarVisibility() {
-    setState(() {
-      isSearchBarVisible = !isSearchBarVisible;
-    });
-  }
+  final searchController = TextEditingController();
+  late List<Map<String, dynamic>> files = [];
+  late List<Map<String, dynamic>> filteredFiles = [];
+  late Icon icon;
 
   @override
   void initState() {
     super.initState();
     _db = ref.read(databaseProvider);
-    debugPrint('Database initialized: ${_db.isOpen}');
     fetchData();
+    icon = const Icon(Icons.access_time);
   }
 
   Future<void> fetchData() async {
@@ -38,20 +33,26 @@ class _ScheduledFilesState extends ConsumerState<ScheduledFiles> {
     setState(() {});
   }
 
+  void toggleSearchBarVisibility() {
+    setState(() {
+      isSearchBarVisible = !isSearchBarVisible;
+    });
+  }
+
   void deleteFile(Map<String, dynamic> file) {
     setState(() {
       _db.delete(file['id']).then((value) {
         if (value == 1) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text('${file['name']} deleted successfully'),
+              content: Text('${file['name']} cancelled successfully'),
             ),
           );
-          fetchData(); // Refetch data after deletion
+          fetchData();
         } else {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text('Failed to delete ${file['name']}'),
+              content: Text('Failed to cancel ${file['name']}'),
             ),
           );
         }
@@ -72,6 +73,14 @@ class _ScheduledFilesState extends ConsumerState<ScheduledFiles> {
     });
   }
 
+  void sortByScheduledTime() {
+    setState(() {
+      filteredFiles.sort((a, b) {
+        return a['scheduled_time'].compareTo(b['scheduled_time']);
+      });
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -79,13 +88,21 @@ class _ScheduledFilesState extends ConsumerState<ScheduledFiles> {
         title: const Text('Scheduled Files', style: TextStyle(fontSize: 28.0)),
         actions: <Widget>[
           IconButton(
-              onPressed: () {
-                fetchData();
-              },
-              icon: const Icon(Icons.refresh)),
+            onPressed: fetchData,
+            icon: const Icon(Icons.refresh),
+          ),
           IconButton(
-            icon: const Icon(Icons.sort_outlined),
-            onPressed: () {},
+            icon: icon,
+            onPressed: () {
+              if (icon.icon == Icons.access_time) {
+                icon = const Icon(Icons.access_time_filled);
+                sortByScheduledTime();
+              } else {
+                icon = const Icon(Icons.access_time);
+                fetchData();
+              }
+              setState(() {});
+            },
           ),
           IconButton(
             icon: const Icon(Icons.search),
@@ -95,32 +112,27 @@ class _ScheduledFilesState extends ConsumerState<ScheduledFiles> {
       ),
       body: Column(
         children: <Widget>[
-          const SizedBox(
-            height: 10,
-          ),
           if (isSearchBarVisible)
-            SearchBar(
-              hintText: "Search for files",
-              shadowColor: MaterialStateColor.resolveWith(
-                  (states) => Colors.transparent),
+            TextField(
               controller: searchController,
-              onSubmitted: (value) {
-                filterFiles(value);
-              },
-              onChanged: (value) {
-                filterFiles(value);
-              },
+              decoration: const InputDecoration(
+                hintText: 'Search for Scheduled files',
+                prefixIcon: Icon(Icons.search)),
+              onChanged: filterFiles,
             ),
           const SizedBox(height: 10),
           Expanded(
             child: ListView.builder(
               itemCount: filteredFiles.length,
               itemBuilder: (BuildContext context, int index) {
-                final file = filteredFiles.elementAt(index);
+                final file = filteredFiles[index];
                 return ListTile(
                   title: Text(file['name']),
                   subtitle: Text(file['path']),
-                  leading: Text(file['scheduled_time'].substring(0, 16)),
+                  leading: Text(file['scheduled_time']
+                      .substring(0, 16)
+                      .split('T')
+                      .join('\n')),
                   trailing: IconButton(
                     icon: const Icon(Icons.cancel_outlined),
                     onPressed: () {
