@@ -31,7 +31,7 @@ class _HomeState extends State<Home> {
           children: <Widget>[
             const Text(
               'Welcome to TimeToDelete',
-              style: TextStyle(fontSize: 24.0),
+              style: TextStyle(fontSize: 20.0),
             ),
             const SizedBox(
               height: 20,
@@ -105,11 +105,13 @@ class _HomeState extends State<Home> {
           _showSchedulerBottomSheet(selectedFiles);
         }
       },
-      iconSize: 50.0,
+      iconSize: 40.0,
       style: ElevatedButton.styleFrom(
         minimumSize: const Size(200, 80),
         textStyle: const TextStyle(fontSize: 20),
         backgroundColor: ThemeData.dark().hoverColor,
+        // make circular button
+        shape: const CircleBorder(),
       ),
     );
   }

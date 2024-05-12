@@ -29,10 +29,9 @@ class FilesystemList extends StatelessWidget {
   final ThemeData? themeData; // Theme data
   final TextDirection? textDirection; // Text direction
   final bool isTimeSorting; // Indicator if sorting by time
-  final bool isAlphaSorting; // Indicator if sorting alphabetically
 
   // Constructor
-  FilesystemList({
+  const FilesystemList({
     Key? key,
     required this.items,
     this.isRoot = false,
@@ -48,16 +47,13 @@ class FilesystemList extends StatelessWidget {
     this.textDirection,
     this.isSearching = false,
     this.isTimeSorting = false,
-    this.isAlphaSorting = false,
   }) : super(key: key);
 
   String handleSort() {
     if (isTimeSorting) {
       return 'Time';
-    } else if (isAlphaSorting) {
-      return 'Alpha';
     } else {
-      return 'None';
+      return 'Alpha';
     }
   }
 
@@ -82,8 +78,6 @@ class FilesystemList extends StatelessWidget {
       if (handleSort() == 'Time') {
         items.sort(
             (a, b) => b.statSync().modified.compareTo(a.statSync().modified));
-      } else if (handleSort() == 'Alpha') {
-        items.sort((a, b) => a.path.compareTo(b.path));
       } else {
         items.sort((a, b) => a.path.compareTo(b.path));
       }
@@ -110,9 +104,6 @@ class FilesystemList extends StatelessWidget {
             items.sort((a, b) =>
                 b.statSync().modified.compareTo(a.statSync().modified));
             print('Sorting by time');
-          } else if (handleSort() == 'Alpha') {
-            items.sort((a, b) => a.path.compareTo(b.path));
-            print('Sorting alphabetically');
           } else {
             print('No sorting');
             items.sort((a, b) => a.path.compareTo(b.path));
@@ -159,20 +150,20 @@ class FilesystemList extends StatelessWidget {
           // Add top navigation widget if not root directory
           if (!isRoot) {
             chs.add(_topNavigation()); // Add navigation widget
-            chs.add(Divider(color: Colors.grey, height: 1)); // Divider line
+            chs.add(const Divider(color: Colors.grey, height: 1)); // Divider line
           }
 
           // Process directory contents
           if (snapshot.data!.isNotEmpty) {
             var dirs = <FileSystemEntity>[]; // List of directories
             var files = <FileSystemEntity>[]; // List of files
-            snapshot.data!.forEach((fse) {
+            for (var fse in snapshot.data!) {
               if (fse is File) {
                 files.add(fse);
               } else if (fse is Directory) {
                 dirs.add(fse);
               }
-            });
+            }
 
             // Concatenate directories and files
             dirs.followedBy(files).forEach((fse) {
@@ -191,7 +182,7 @@ class FilesystemList extends StatelessWidget {
                   textDirection: textDirection,
                 ),
               );
-              chs.add(Divider(
+              chs.add(const Divider(
                   color: Colors.grey, height: 1)); // Divider between items
               items.add(
                 FileSystemMiniItem(

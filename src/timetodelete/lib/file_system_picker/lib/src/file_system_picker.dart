@@ -75,7 +75,7 @@ class FilesystemPicker extends StatefulWidget {
     );
   }
 
-  // ---
+  // --- Properties --- //
 
   final List<Directory> rootDirectories;
   final List<String>? rootNames;
@@ -91,7 +91,7 @@ class FilesystemPicker extends StatefulWidget {
   final ThemeData? themeData;
   final TextDirection? textDirection;
 
-  FilesystemPicker({
+  const FilesystemPicker({
     Key? key,
     required this.rootDirectories,
     this.rootNames,
@@ -119,7 +119,6 @@ class _FilesystemPickerState extends State<FilesystemPicker> {
   bool toggleSelectAll = false;
   bool isSearching = false;
   bool isTimeSorting = false;
-  bool isAlphaSorting = false;
   SearchController searchController = SearchController();
 
   final List<FileSystemMiniItem> items = [];
@@ -255,7 +254,7 @@ class _FilesystemPickerState extends State<FilesystemPicker> {
                         ? [
                             IconButton(
                                 tooltip: 'Select/Unselect All',
-                                icon: Icon(Icons.select_all),
+                                icon: const Icon(Icons.select_all),
                                 onPressed: () {
                                   items.forEach((p) {
                                     if (widget.fsType == FilesystemType.all ||
@@ -286,7 +285,7 @@ class _FilesystemPickerState extends State<FilesystemPicker> {
                                     items.clear();
                                   });
                                 },
-                                icon: Icon(Icons.search)),
+                                icon: const Icon(Icons.search)),
                           ]
                         : [
                             IconButton(
@@ -296,7 +295,7 @@ class _FilesystemPickerState extends State<FilesystemPicker> {
                                     items.clear();
                                   });
                                 },
-                                icon: Icon(Icons.search)),
+                                icon: const Icon(Icons.search)),
                             IconButton(
                                 onPressed: () {
                                   setState(() {
@@ -304,15 +303,7 @@ class _FilesystemPickerState extends State<FilesystemPicker> {
                                     // print(isTimeSorting);
                                   });
                                 },
-                                icon: Icon(Icons.access_time)),
-                            IconButton(
-                                onPressed: () {
-                                  setState(() {
-                                    isAlphaSorting = !isAlphaSorting;
-                                    // print(isAlphaSorting);
-                                  });
-                                },
-                                icon: Icon(Icons.sort_by_alpha)),
+                                icon: const Icon(Icons.access_time)),
                           ],
                     bottom: _buildBreadCrumb(context),
                   ),
@@ -330,7 +321,7 @@ class _FilesystemPickerState extends State<FilesystemPicker> {
                           child: TextField(
                             decoration: InputDecoration(
                               hintText: 'Search Files',
-                              prefixIcon: Icon(Icons.search),
+                              prefixIcon: const Icon(Icons.search),
                               suffixIcon: IconButton(
                                 onPressed: () {
                                   setState(() {
@@ -338,7 +329,7 @@ class _FilesystemPickerState extends State<FilesystemPicker> {
                                     items.clear();
                                   });
                                 },
-                                icon: Icon(Icons.clear),
+                                icon: const Icon(Icons.clear),
                               ),
                             ),
                             controller: searchController,
@@ -380,7 +371,7 @@ class _FilesystemPickerState extends State<FilesystemPicker> {
       preferredSize: const Size.fromHeight(50),
       child: Theme(
         data: ThemeData(
-          textTheme: TextTheme(
+          textTheme: const TextTheme(
             labelLarge: TextStyle(),
           ),
         ),
@@ -416,7 +407,7 @@ class _FilesystemPickerState extends State<FilesystemPicker> {
                   Theme.of(context).primaryColor,
               child: SafeArea(
                 child: Container(
-                  margin: EdgeInsets.only(top: 50),
+                  margin: const EdgeInsets.only(top: 50),
                   child: ListTile(
                     title: Text(
                       'Select Directory',
@@ -461,7 +452,7 @@ class _FilesystemPickerState extends State<FilesystemPicker> {
               padding: EdgeInsets.zero,
               itemCount: selectedPaths.length,
               separatorBuilder: (_, index) =>
-                  Divider(color: Colors.grey, height: 1),
+                  const Divider(color: Colors.grey, height: 1),
               itemBuilder: (_, index) {
                 var pathString = selectedPaths.keys.elementAt(index);
                 var fseType = selectedPaths.values.elementAt(index);
@@ -505,7 +496,7 @@ class _FilesystemPickerState extends State<FilesystemPicker> {
 
   Widget _buildBody(BuildContext context) {
     if (permissionRequesting || loadingFSE || rootDirectory == null) {
-      return Center(child: CircularProgressIndicator());
+      return const Center(child: CircularProgressIndicator());
     } else if (permissionAllowed == false) {
       return Container(
         alignment: Alignment.center,
@@ -545,7 +536,6 @@ class _FilesystemPickerState extends State<FilesystemPicker> {
         rootDirectory: directory!,
         isSearching: true,
         isTimeSorting: isTimeSorting,
-        isAlphaSorting: isAlphaSorting,
         onChange: (Directory? value) {},
         onSelect: (path, isSelected, itemType) {
           setState(() {
@@ -591,7 +581,6 @@ class _FilesystemPickerState extends State<FilesystemPicker> {
         });
       },
       isTimeSorting: isTimeSorting,
-      isAlphaSorting: isAlphaSorting,
     );
   }
 
