@@ -110,7 +110,6 @@ class _HomeState extends State<Home> {
         minimumSize: const Size(200, 80),
         textStyle: const TextStyle(fontSize: 20),
         backgroundColor: ThemeData.dark().hoverColor,
-        // make circular button
         shape: const CircleBorder(),
       ),
     );

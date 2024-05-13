@@ -1,6 +1,5 @@
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
-import 'package:timetodelete/main.dart';
 
 class DBHelper {
   static final DBHelper _instance = DBHelper._internal();
@@ -46,7 +45,6 @@ class DBHelper {
       final dbClient = await database;
       int res = await dbClient.insert('scheduled_files', row);
       if (res != 0) {
-        await backgroundService.updateAllFiles();
         return {true: 'Success'};
       } else {
         return {false: 'Failed'};
@@ -73,7 +71,6 @@ class DBHelper {
       where: 'id = ?',
       whereArgs: [id],
     );
-    await backgroundService.updateAllFiles();
     return res;
   }
 

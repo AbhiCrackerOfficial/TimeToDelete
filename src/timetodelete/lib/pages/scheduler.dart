@@ -145,11 +145,13 @@ class _SchedulerState extends ConsumerState<Scheduler> {
   void _saveScheduledDeletion() async {
     if (validateDateTime()) {
       for (final file in widget.selectedFiles) {
+        print(dateTime!.toUtc().toIso8601String().substring(0, 16));
         Map<bool, String> res = await _db.insert({
           'name': file.name,
           'path': file.absolutePath,
-          'scheduled_time': dateTime?.toIso8601String(),
+          'scheduled_time': dateTime!.toUtc().toIso8601String().substring(0, 16),
         });
+        
         if (res.keys.first) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(

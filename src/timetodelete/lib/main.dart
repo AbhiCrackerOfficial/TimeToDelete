@@ -8,8 +8,6 @@ import 'package:timetodelete/service/background_service.dart';
 import 'package:timetodelete/utils/functions.dart';
 import 'package:flutter_background_service/flutter_background_service.dart';
 
-BackgroundService backgroundService = BackgroundService();
-
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await isBatteryOptimizationDisable();
@@ -69,10 +67,8 @@ Future<void> initializeService() async {
 
 @pragma('vm:entry-point')
 void onStart(ServiceInstance service) async {
-  service.on('start').listen((event) {
-    Timer.periodic(const Duration(minutes: 1), (timer) {
-      backgroundService.checkFiles();
-    });
+  BackgroundService backgroundService = BackgroundService();
+  Timer.periodic(const Duration(minutes: 1), (timer) {
+    backgroundService.checkFiles();
   });
-  
 }

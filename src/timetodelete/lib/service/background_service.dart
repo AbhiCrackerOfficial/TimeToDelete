@@ -26,11 +26,12 @@ class BackgroundService {
   /// Deletes a file with the given [id] and [file].
   ///
   /// Returns the number of rows affected by the delete operation.
-  Future<int> deleteFile(int id, File file) async {
+  Future<void> deleteFile(int id, File file) async {
     if (file.existsSync()) {
       await file.delete();
     }
-    return await _db.delete(id);
+    await _db.delete(id);
+    return await updateAllFiles();
   }
 
   /// Checks all files and deletes those whose scheduled time has passed.
@@ -38,11 +39,14 @@ class BackgroundService {
   /// This method iterates over all files and deletes those whose scheduled time
   /// is earlier than the current time.
   Future<void> checkFiles() async {
-    print("Checking files");
+    await updateAllFiles();
+    print("Checking files : ${allFiles.length} files");
     final currentTime = DateTime.now();
     print("Current time: $currentTime");
     for (final file in allFiles) {
       final scheduledTime = DateTime.parse(file['scheduled_time']);
+      print("Name: ${file['name']}");
+      print("Scheduled time: $scheduledTime");
       if (currentTime.isAfter(scheduledTime)) {
         print("Deleting file: ${file['path']}");
         await deleteFile(file['id'], File(file['path']));
