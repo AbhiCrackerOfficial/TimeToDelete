@@ -75,10 +75,6 @@ class DBHelper {
     );
     await backgroundService.updateAllFiles();
     return res;
-
-    // output will be like this:
-    // 1: success
-    // 0: failed
   }
 
   // Update a row in the 'scheduled_files' table based on id

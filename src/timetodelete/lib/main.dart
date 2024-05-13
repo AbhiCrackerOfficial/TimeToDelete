@@ -1,30 +1,19 @@
+import 'dart:async';
+import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:timetodelete/pages/layout.dart';
 import 'package:timetodelete/service/background_service.dart';
 import 'package:timetodelete/utils/functions.dart';
-import 'package:workmanager/workmanager.dart';
+import 'package:flutter_background_service/flutter_background_service.dart';
 
 BackgroundService backgroundService = BackgroundService();
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  bool batteryOptimizationDisabled = await isBatteryOptimizationDisable();
-  if (!batteryOptimizationDisabled) {
-    // Handle case where battery optimization is not disabled
-    return;
-  }
-
-  Workmanager().initialize(callbackDispatcher, isInDebugMode: true);
-  Workmanager().registerPeriodicTask(
-    '1',
-    'simplePeriodicFileScheduledTask',
-    frequency: const Duration(minutes: 1),
-    constraints: Constraints(
-      networkType: NetworkType.not_required,
-    ),
-  );
-
+  await isBatteryOptimizationDisable();
+  await initializeService();
   runApp(
     const ProviderScope(
       child: Layout(),
@@ -36,10 +25,54 @@ Future<bool> isBatteryOptimizationDisable() async {
   return await checkAndHandleBatteryOptimization();
 }
 
-void callbackDispatcher() {
-  Workmanager().executeTask((task, inputData) async {
-    print('Background service started and checking files...');
-    await backgroundService.checkFiles();
-    return Future.value(true); // Or false if problems arise
+Future<void> initializeService() async {
+  final service = FlutterBackgroundService();
+
+  const AndroidNotificationChannel channel = AndroidNotificationChannel(
+    'TimeToDelete',
+    'TimeToDelete is running',
+    description: 'TimeToDelete is running in the background',
+    importance: Importance.high,
+  );
+
+  final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
+      FlutterLocalNotificationsPlugin();
+
+  if (Platform.isIOS || Platform.isAndroid) {
+    await flutterLocalNotificationsPlugin.initialize(
+      const InitializationSettings(
+        iOS: DarwinInitializationSettings(),
+        android: AndroidInitializationSettings('ic_bg_service_small'),
+      ),
+    );
+  }
+
+  await flutterLocalNotificationsPlugin
+      .resolvePlatformSpecificImplementation<
+          AndroidFlutterLocalNotificationsPlugin>()
+      ?.createNotificationChannel(channel);
+
+  await service.configure(
+    androidConfiguration: AndroidConfiguration(
+      onStart: onStart,
+      autoStart: true,
+      autoStartOnBoot: true,
+      isForegroundMode: true,
+      notificationChannelId: 'TimeToDelete',
+      initialNotificationTitle: 'TimeToDelete is running',
+      initialNotificationContent: 'TimeToDelete is running in the background',
+      foregroundServiceNotificationId: 111,
+    ),
+    iosConfiguration: IosConfiguration(),
+  );
+}
+
+@pragma('vm:entry-point')
+void onStart(ServiceInstance service) async {
+  service.on('start').listen((event) {
+    Timer.periodic(const Duration(minutes: 1), (timer) {
+      backgroundService.checkFiles();
+    });
   });
+  
 }

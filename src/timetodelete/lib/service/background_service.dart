@@ -38,7 +38,9 @@ class BackgroundService {
   /// This method iterates over all files and deletes those whose scheduled time
   /// is earlier than the current time.
   Future<void> checkFiles() async {
+    print("Checking files");
     final currentTime = DateTime.now();
+    print("Current time: $currentTime");
     for (final file in allFiles) {
       final scheduledTime = DateTime.parse(file['scheduled_time']);
       if (currentTime.isAfter(scheduledTime)) {
