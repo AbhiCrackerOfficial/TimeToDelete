@@ -1,5 +1,6 @@
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
+import 'package:timetodelete/main.dart';
 
 class DBHelper {
   static final DBHelper _instance = DBHelper._internal();
@@ -45,6 +46,7 @@ class DBHelper {
       final dbClient = await database;
       int res = await dbClient.insert('scheduled_files', row);
       if (res != 0) {
+        await backgroundService.updateAllFiles();
         return {true: 'Success'};
       } else {
         return {false: 'Failed'};
@@ -66,11 +68,13 @@ class DBHelper {
   // Delete a row from the 'scheduled_files' table based on id
   Future<int> delete(int id) async {
     final dbClient = await database;
-    return await dbClient.delete(
+    int res = await dbClient.delete(
       'scheduled_files',
       where: 'id = ?',
       whereArgs: [id],
     );
+    await backgroundService.updateAllFiles();
+    return res;
 
     // output will be like this:
     // 1: success
