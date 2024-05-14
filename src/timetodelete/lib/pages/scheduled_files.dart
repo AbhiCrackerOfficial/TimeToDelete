@@ -17,6 +17,7 @@ class _ScheduledFilesState extends ConsumerState<ScheduledFiles> {
   late List<Map<String, dynamic>> files = [];
   late List<Map<String, dynamic>> filteredFiles = [];
   late Icon icon;
+  bool _isDisposed = false;
 
   @override
   void initState() {
@@ -26,59 +27,76 @@ class _ScheduledFilesState extends ConsumerState<ScheduledFiles> {
     icon = const Icon(Icons.access_time);
   }
 
+  @override
+  void dispose() {
+    _isDisposed = true;
+    super.dispose();
+  }
+
   Future<void> fetchData() async {
     final db = await _db.database;
     files = await db.query('scheduled_files');
-    filteredFiles = List.from(files);
-    setState(() {});
+    if (!_isDisposed) {
+      filteredFiles = List.from(files);
+      setState(() {});
+    }
   }
 
   void toggleSearchBarVisibility() {
-    setState(() {
-      isSearchBarVisible = !isSearchBarVisible;
-    });
+    if (!_isDisposed) {
+      setState(() {
+        isSearchBarVisible = !isSearchBarVisible;
+      });
+    }
   }
 
   void deleteFile(Map<String, dynamic> file) {
-    setState(() {
+    if (!_isDisposed) {
       _db.delete(file['id']).then((value) {
-        if (value == 1) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text("${file['name']}'s Schedule cancelled successfully"),
-            ),
-          );
-          fetchData();
-        } else {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text("Failed to cancel ${file['name']}'s Schedule"),
-            ),
-          );
+        if (!_isDisposed) {
+          if (value == 1) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content:
+                    Text("${file['name']}'s Schedule cancelled successfully"),
+              ),
+            );
+            fetchData();
+          } else {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text("Failed to cancel ${file['name']}'s Schedule"),
+              ),
+            );
+          }
         }
       });
-    });
+    }
   }
 
   void filterFiles(String query) {
-    setState(() {
-      filteredFiles = files
-          .where((file) =>
-              file['name'].toLowerCase().contains(query.toLowerCase()) ||
-              file['path'].toLowerCase().contains(query.toLowerCase()) ||
-              file['scheduled_time']
-                  .toLowerCase()
-                  .contains(query.toLowerCase()))
-          .toList();
-    });
+    if (!_isDisposed) {
+      setState(() {
+        filteredFiles = files
+            .where((file) =>
+                file['name'].toLowerCase().contains(query.toLowerCase()) ||
+                file['path'].toLowerCase().contains(query.toLowerCase()) ||
+                file['scheduled_time']
+                    .toLowerCase()
+                    .contains(query.toLowerCase()))
+            .toList();
+      });
+    }
   }
 
   void sortByScheduledTime() {
-    setState(() {
-      filteredFiles.sort((a, b) {
-        return a['scheduled_time'].compareTo(b['scheduled_time']);
+    if (!_isDisposed) {
+      setState(() {
+        filteredFiles.sort((a, b) {
+          return a['scheduled_time'].compareTo(b['scheduled_time']);
+        });
       });
-    });
+    }
   }
 
   @override
@@ -94,14 +112,17 @@ class _ScheduledFilesState extends ConsumerState<ScheduledFiles> {
           IconButton(
             icon: icon,
             onPressed: () {
-              if (icon.icon == Icons.access_time) {
-                icon = const Icon(Icons.access_time_filled);
-                sortByScheduledTime();
-              } else {
-                icon = const Icon(Icons.access_time);
-                fetchData();
+              if (!_isDisposed) {
+                setState(() {
+                  if (icon.icon == Icons.access_time) {
+                    icon = const Icon(Icons.access_time_filled);
+                    sortByScheduledTime();
+                  } else {
+                    icon = const Icon(Icons.access_time);
+                    fetchData();
+                  }
+                });
               }
-              setState(() {});
             },
           ),
           IconButton(
@@ -116,8 +137,8 @@ class _ScheduledFilesState extends ConsumerState<ScheduledFiles> {
             TextField(
               controller: searchController,
               decoration: const InputDecoration(
-                hintText: 'Search for Scheduled files',
-                prefixIcon: Icon(Icons.search)),
+                  hintText: 'Search for Scheduled files',
+                  prefixIcon: Icon(Icons.search)),
               onChanged: filterFiles,
             ),
           const SizedBox(height: 10),
