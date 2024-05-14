@@ -45,14 +45,14 @@ class _ScheduledFilesState extends ConsumerState<ScheduledFiles> {
         if (value == 1) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text('${file['name']} cancelled successfully'),
+              content: Text("${file['name']}'s Schedule cancelled successfully"),
             ),
           );
           fetchData();
         } else {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text('Failed to cancel ${file['name']}'),
+              content: Text("Failed to cancel ${file['name']}'s Schedule"),
             ),
           );
         }

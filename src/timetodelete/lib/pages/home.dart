@@ -4,6 +4,7 @@ import 'package:timetodelete/file_system_picker/lib/filesystem_picker.dart';
 import 'package:timetodelete/file_system_picker/lib/src/utils/models/file_system_mini_item.dart';
 import 'package:timetodelete/pages/scheduler.dart';
 import '../utils/functions.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class Home extends StatefulWidget {
   const Home({Key? key}) : super(key: key);
@@ -74,6 +75,12 @@ class _HomeState extends State<Home> {
               },
               child: const Text('Close'),
             ),
+            TextButton(
+              onPressed: () {
+                launchUrl(Uri.parse("https://github.com/AbhiCrackerOfficial/TimeToDelete/issues"));
+              },
+              child: const Text('Report a Bug'),
+            ),
           ],
         );
       },
@@ -86,7 +93,8 @@ class _HomeState extends State<Home> {
         Icons.add,
       ),
       onPressed: () async {
-        Iterable<FileSystemMiniItem>? selectedFiles = await FilesystemPicker.open(
+        Iterable<FileSystemMiniItem>? selectedFiles =
+            await FilesystemPicker.open(
           title: 'Select files',
           context: context,
           multiSelect: true,
