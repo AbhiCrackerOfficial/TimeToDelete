@@ -521,7 +521,7 @@ class _FilesystemPickerState extends State<FilesystemPicker> {
             ),
           ),
         );
-      }
+      }      
 
       return FilesystemList(
         items: items,
@@ -625,7 +625,7 @@ class _FilesystemPickerState extends State<FilesystemPicker> {
                       permissionAllowed &&
                       selectedPaths.isNotEmpty)
                   ? () => Navigator.pop(
-                      context, // return values in FileSystemMiniItem
+                      context, 
                       selectedPaths.entries
                           .map((e) => FileSystemMiniItem(e.key, e.value))
                           .toList())

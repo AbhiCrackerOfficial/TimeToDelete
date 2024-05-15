@@ -5,6 +5,7 @@ import 'package:timetodelete/file_system_picker/lib/src/constants/typedefs/typed
 import 'package:timetodelete/file_system_picker/lib/src/utils/helpers/file_icon_helper.dart';
 import 'package:timetodelete/file_system_picker/lib/src/widgets/filename_text.dart';
 import 'package:flutter/material.dart';
+import 'package:open_file/open_file.dart';
 
 class FilesystemListTile extends StatelessWidget {
   final FilesystemType fsType;
@@ -38,7 +39,8 @@ class FilesystemListTile extends StatelessWidget {
         ? (themeData ?? Theme.of(context)).primaryColorLight
         : (item is File
             ? (themeData ?? Theme.of(context)).unselectedWidgetColor
-            : (folderIconColor ?? (themeData ?? Theme.of(context)).primaryColor));
+            : (folderIconColor ??
+                (themeData ?? Theme.of(context)).primaryColor));
     if (item is Directory) {
       ic = Icon(
         Icons.folder,
@@ -109,12 +111,46 @@ class FilesystemListTile extends StatelessWidget {
     return tx;
   }
 
+  void OpenTheFile(BuildContext context) {
+    final List<String> options = ['Open', 'Back'];
+    final List<Function> functions = [
+      () {
+        OpenFile.open(item.path);
+        Navigator.pop(context);
+      },
+      () {
+        Navigator.pop(context);
+      }
+    ];
+    showModalBottomSheet(
+        context: context,
+        builder: (BuildContext bc) {
+          return Container(
+            child: Wrap(
+              children: List.generate(options.length, (index) {
+                return ListTile(
+                  title: Text(options[index]),
+                  onTap: () {
+                    functions[index]();
+                  },
+                );
+              }),
+            ),
+          );
+        });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Material(
       key: Key(item.absolute.path),
-      color: isSelected ? (themeData ?? Theme.of(context)).primaryColorDark : Colors.transparent,
+      color: isSelected
+          ? (themeData ?? Theme.of(context)).primaryColorDark
+          : Colors.transparent,
       child: InkWell(
+          onLongPress: () {
+            OpenTheFile(context);
+          },
           onTap: () {
             if (item is Directory) {
               onChange(item as Directory);
