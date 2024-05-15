@@ -10,6 +10,17 @@ TimeToDelete is a cutting-edge Android application built with Flutter, designed 
 - **Customizable**: Tailor the deletion schedules according to your needs and preferences.
 - **Notifications**: Get notified before files are scheduled to be deleted, giving you control over the deletion process.
 
+## Screenshots
+
+![Screenshot 1](screenshots/main.png)
+*Home Screen*
+
+![Screenshot 2](screenshots/schedule.png)
+*Scheduling*
+
+![Screenshot 3](screenshots/scheduled_files.png)
+*Scheduled Files*
+
 ## Getting Started
 
 This section will guide you through getting a copy of the project up and running on your local machine for development and testing purposes. As TimeToDelete is currently in development, specific installation instructions will be provided upon the app's completion.
