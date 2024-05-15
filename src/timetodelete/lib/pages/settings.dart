@@ -89,6 +89,11 @@ class _SettingsState extends State<Settings> {
     }
   }
 
+  void StarTheRepository() async {
+    await launchUrl(
+        Uri.parse('https://github.com/AbhiCrackerOfficial/TimeToDelete/'));
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -97,6 +102,18 @@ class _SettingsState extends State<Settings> {
       ),
       body: ListView(
         children: [
+          GestureDetector(
+            child: const ListTile(
+              title: Text('Star the Repository'),
+              subtitle:
+                  Text('Star the repository on GitHub to show your support'),
+              trailing: Icon(Icons.star_border_sharp),
+            ),
+            onTap: () {
+              StarTheRepository();
+            },
+          ),
+          Divider(),
           GestureDetector(
             child: const ListTile(
               title: Text('Check for updates'),
