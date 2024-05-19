@@ -3,6 +3,7 @@ import 'package:timetodelete/data/theme_data.dart';
 import 'package:timetodelete/pages/home.dart';
 import 'package:timetodelete/pages/scheduled_files.dart';
 import 'package:timetodelete/pages/settings.dart';
+import 'package:timetodelete/main.dart';
 
 class Layout extends StatefulWidget {
   const Layout({Key? key}) : super(key: key);
@@ -14,6 +15,17 @@ class Layout extends StatefulWidget {
 class _LayoutState extends State<Layout> {
   int _selectedIndex = 0;
   final PageController _pageController = PageController();
+
+  Future<void> importantChecks() async {
+    await isBatteryOptimizationDisable();
+    await initializeService();
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    importantChecks();
+  }
 
   @override
   Widget build(BuildContext context) {

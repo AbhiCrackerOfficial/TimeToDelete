@@ -3,18 +3,16 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:timetodelete/pages/layout.dart';
+import 'package:timetodelete/pages/splash.dart';
 import 'package:timetodelete/service/background_service.dart';
 import 'package:timetodelete/utils/functions.dart';
 import 'package:flutter_background_service/flutter_background_service.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await isBatteryOptimizationDisable();
-  await initializeService();
   runApp(
     const ProviderScope(
-      child: Layout(),
+      child: Splash(),
     ),
   );
 }
