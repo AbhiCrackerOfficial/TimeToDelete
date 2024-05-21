@@ -586,7 +586,7 @@ class _FilesystemPickerState extends State<FilesystemPicker> {
 
   Widget _buildBottomButtons(BuildContext context) {
     return BottomAppBar(
-      color: (widget.themeData ?? Theme.of(context)).primaryColor,
+      color: (widget.themeData ?? Theme.of(context)).highlightColor,
       child: Container(
         height: 50,
         child: Row(
@@ -595,12 +595,8 @@ class _FilesystemPickerState extends State<FilesystemPicker> {
           children: [
             Expanded(
                 child: TextButton.icon(
-              style: TextButton.styleFrom(
-                  // primary: AppBarTheme.of(context).textTheme?.headline6?.color ??
-                  //     Theme.of(context).primaryTextTheme.headline6?.color,
-
-                  ),
-              icon: Icon(Icons.cancel),
+              // style: TextButton.styleFrom(),
+              icon: const Icon(Icons.cancel),
               label: (widget.cancelText != null)
                   ? Text(widget.cancelText!)
                   : const Text('Cancel'),
