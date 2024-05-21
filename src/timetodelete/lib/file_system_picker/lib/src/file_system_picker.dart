@@ -587,7 +587,7 @@ class _FilesystemPickerState extends State<FilesystemPicker> {
   Widget _buildBottomButtons(BuildContext context) {
     return BottomAppBar(
       color: (widget.themeData ?? Theme.of(context)).highlightColor,
-      child: Container(
+      child: SizedBox(
         height: 50,
         child: Row(
           mainAxisSize: MainAxisSize.max,
