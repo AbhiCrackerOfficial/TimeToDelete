@@ -595,7 +595,6 @@ class _FilesystemPickerState extends State<FilesystemPicker> {
           children: [
             Expanded(
                 child: TextButton.icon(
-              // style: TextButton.styleFrom(),
               icon: const Icon(Icons.cancel),
               label: (widget.cancelText != null)
                   ? Text(widget.cancelText!)
