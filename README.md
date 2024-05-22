@@ -1,4 +1,14 @@
-# TimeToDelete
+<div align="center">
+  <h1>TimeToDelete - Schedule Out Clutter</h1>
+</div>
+
+
+<div align="center">
+  <kbd>
+    <img width="200px" height="200px" src="https://github.com/AbhiCrackerOfficial/TimeToDelete/blob/main/src/timetodelete/assets/images/logo-white.png"/>
+  </kbd>
+</div>
+
 
 TimeToDelete is a cutting-edge Android application built with Flutter, designed to streamline the management of device storage through the scheduled deletion of files. This intuitive app allows users to mark files for deletion at specified times, ensuring that unnecessary clutter is removed efficiently, keeping your device clean and your storage optimized.
 
