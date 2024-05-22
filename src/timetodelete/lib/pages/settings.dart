@@ -38,6 +38,12 @@ class _SettingsState extends State<Settings> {
                 ),
                 TextButton(
                   onPressed: () async {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text('New Update Found... Redirecting to GitHub!'),
+                        duration: Duration(seconds: 2),
+                      ),
+                    );
                     await launchUrl(Uri.parse(
                         'https://github.com/AbhiCrackerOfficial/TimeToDelete/releases/latest'));
                   },
@@ -110,6 +116,12 @@ class _SettingsState extends State<Settings> {
               trailing: Icon(Icons.star_border_sharp),
             ),
             onTap: () {
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(
+                  content: Text('Opening GitHub... Just wait a moment!'),
+                  duration: Duration(seconds: 2),
+                ),
+              );
               StarTheRepository();
             },
           ),
